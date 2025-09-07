@@ -1,0 +1,44 @@
+
+
+# Core dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Vector database and embeddings
+chromadb>=1.0.0
+sentence-transformers>=2.2.0
+
+# LLM and API
+google-generativeai>=0.8.0
+
+# Web framework
+streamlit>=1.28.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# # Core dependencies
+# pandas
+# numpy
+# scikit-learn
+
+# # Vector database and embeddings
+# chromadb
+# sentence-transformers
+
+# # LLM and API
+# openai
+# google-generativeai
+# huggingface-hub
+# transformers
+
+# # Web framework
+# streamlit
+# flask
+
+# # Utilities
+# python-dotenv
+# langchain
+# langchain-community
+# tiktoken
