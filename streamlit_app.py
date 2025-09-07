@@ -143,7 +143,7 @@ class GitaLLMHandler:
         api_key = st.secrets.get("GOOGLE_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel("gemini-2.5-flash")
+            self.model = genai.GenerativeModel("gemini-1.5-flash")
         else:
             self.model = None
     
@@ -366,7 +366,6 @@ if verses:
         for i, sample_query in enumerate(sample_queries):
             if st.button(sample_query, key=f"sample_{i}"):
                 st.session_state.current_query = sample_query
-                st.switch_page("💬 Ask Question")
                 st.rerun()
 
 else:
