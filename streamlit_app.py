@@ -366,6 +366,7 @@ if verses:
         for i, sample_query in enumerate(sample_queries):
             if st.button(sample_query, key=f"sample_{i}"):
                 st.session_state.current_query = sample_query
+                st.switch_page("💬 Ask Question")
                 st.rerun()
 
 else:
