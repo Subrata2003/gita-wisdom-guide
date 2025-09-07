@@ -1,4 +1,8 @@
 import streamlit as st
+import sys
+import sqlite3
+import pysqlite3
+sys.modules['sqlite3'] = pysqlite3
 
 st.set_page_config(
     page_title="Gita Wisdom Guide",
