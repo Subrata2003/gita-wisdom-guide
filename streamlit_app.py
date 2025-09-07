@@ -365,8 +365,59 @@ if verses:
         
         for i, sample_query in enumerate(sample_queries):
             if st.button(sample_query, key=f"sample_{i}"):
-                st.session_state.current_query = sample_query
-                st.rerun()
+                # Process the sample query directly
+                with st.spinner("🔍 Searching for relevant wisdom..."):
+                    # Find relevant verses
+                    relevant_verses = retriever.find_relevant_verses(sample_query)
+                    themes = retriever.extract_query_themes(sample_query)
+                    
+                    # Create context
+                    context_parts = []
+                    for verse in relevant_verses:
+                        verse_text = f"Chapter {verse['chapter']}, Verse {verse['verse']}: {verse['text']}"
+                        context_parts.append(verse_text)
+                    
+                    context = {
+                        'formatted_context': '\n\n'.join(context_parts),
+                        'used_verses': relevant_verses,
+                        'query_themes': themes,
+                        'total_verses': len(relevant_verses)
+                    }
+                
+                with st.spinner("💭 Generating guidance..."):
+                    # Generate response
+                    result = llm_handler.generate_response(sample_query, context)
+                
+                # Display the question and response
+                st.markdown(f"**Question:** {sample_query}")
+                
+                # Display response
+                if not result.get('error'):
+                    st.markdown("### 🌟 Guidance")
+                    st.markdown(result['response'])
+                    
+                    # Show relevant verses
+                    if context.get('used_verses'):
+                        with st.expander("📖 Relevant Verses Referenced", expanded=False):
+                            for verse in context['used_verses']:
+                                st.markdown(f"""
+                                **Chapter {verse['chapter']}, Verse {verse['verse']}**  
+                                *Theme: {verse.get('theme', 'General')}*
+                                
+                                {verse['text']}
+                                
+                                ---
+                                """)
+                    
+                    # Show themes
+                    if context.get('query_themes'):
+                        st.markdown("### 🎭 Key Themes")
+                        theme_cols = st.columns(len(context['query_themes']))
+                        for j, theme in enumerate(context['query_themes']):
+                            with theme_cols[j]:
+                                st.markdown(f"**{theme.title()}**")
+                else:
+                    st.error(f"Error generating response: {result['response']}")
 
 else:
     st.error("Could not load Gita verses. Please check the data file.")
