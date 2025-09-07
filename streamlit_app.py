@@ -24,7 +24,7 @@ sys.path.insert(0, str(src_path))
 
 # Import the main app
 try:
-    from app_fixed import GitaWisdomApp, apply_custom_styling
+    from app import GitaWisdomApp, apply_custom_styling
     
     def main():
         """Main function to run the app"""
