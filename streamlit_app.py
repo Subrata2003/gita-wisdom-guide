@@ -23,7 +23,7 @@ def classify_question_type(query: str) -> str:
         'who is krishna', 'who is arjuna', 'what is dharma', 'what is karma',
         'when did', 'where was', 'what does', 'define', 'explain',
         'how many', 'which chapter', 'what chapter', 'tell me about',
-        'who said', 'what is the story', 'summary of', 'overview of', 'who is'
+        'who said', 'what is the story', 'summary of', 'overview of', 'who is', 'what is', 
     ]
     
     # Check for factual patterns
@@ -252,8 +252,10 @@ Based on these sacred teachings, provide a response that:
 1. Addresses the user's concern with compassion (2-3 sentences)
 2. References the relevant verses naturally (1-2 key verses)
 3. Provides actionable spiritual guidance (3-4 practical points)
-4. Keeps the total response under 250 words
-5. Uses a structured format with clear sections"""
+4. Keeps the total response under 500 words
+5. Uses a structured format with clear sections
+6. Use shlokas as reference and to make it more asthetic
+"""
 
             response = self.model.generate_content(prompt)
             response_text = response.text
