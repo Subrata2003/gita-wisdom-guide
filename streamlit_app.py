@@ -23,7 +23,7 @@ def classify_question_type(query: str) -> str:
         'who is krishna', 'who is arjuna', 'what is dharma', 'what is karma',
         'when did', 'where was', 'what does', 'define', 'explain',
         'how many', 'which chapter', 'what chapter', 'tell me about',
-        'who said', 'what is the story', 'summary of', 'overview of'
+        'who said', 'what is the story', 'summary of', 'overview of', 'who is'
     ]
     
     # Check for factual patterns
