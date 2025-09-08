@@ -51,18 +51,21 @@ st.markdown("""
 /* Main app background with enhanced cosmic Krishna image */
 .stApp {
     background: 
-        /* Multiple overlay gradients for depth */
-        radial-gradient(circle at 20% 80%, rgba(120, 0, 150, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(0, 100, 200, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(255, 100, 0, 0.2) 0%, transparent 50%),
-        /* Main image */
-        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), 
+        /* Reduced overlay opacity for clearer image */
+        radial-gradient(circle at 20% 80%, rgba(120, 0, 150, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 100, 200, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 100, 0, 0.1) 0%, transparent 50%),
+        /* Lighter main overlay for image clarity */
+        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), 
         url('https://raw.githubusercontent.com/Subrata2003/gita-wisdom-guide/main/assets/krishna_background.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: center center;
     background-attachment: fixed;
     background-repeat: no-repeat;
     min-height: 100vh;
+    /* Enhanced image rendering */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 /* Remove default Streamlit padding */
