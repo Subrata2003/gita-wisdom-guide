@@ -12,6 +12,36 @@ import google.generativeai as genai
 import re
 from typing import List, Dict, Optional
 
+def classify_question_type(query: str) -> str:
+    """Classify the type of question being asked"""
+    query_lower = query.lower()
+    
+    # Factual question patterns
+    factual_patterns = [
+        'who wrote', 'who is the author', 'when was written', 'when was composed',
+        'how many chapters', 'how many verses', 'what is the meaning of',
+        'who is krishna', 'who is arjuna', 'what is dharma', 'what is karma',
+        'when did', 'where was', 'what does', 'define', 'explain',
+        'how many', 'which chapter', 'what chapter', 'tell me about',
+        'who said', 'what is the story', 'summary of', 'overview of'
+    ]
+    
+    # Check for factual patterns
+    if any(pattern in query_lower for pattern in factual_patterns):
+        return 'factual'
+    
+    # Personal guidance patterns
+    guidance_patterns = [
+        'i am', 'i feel', 'how do i', 'help me', 'what should i do',
+        'i\'m feeling', 'i\'m confused', 'i\'m struggling', 'advice',
+        'guidance', 'suggest', 'recommend'
+    ]
+    
+    if any(pattern in query_lower for pattern in guidance_patterns):
+        return 'guidance'
+    
+    return 'guidance'  # Default to guidance mode
+
 # Custom CSS for better styling
 st.markdown("""
 <style>
@@ -143,12 +173,49 @@ class GitaLLMHandler:
         api_key = st.secrets.get("GOOGLE_API_KEY")
         if api_key:
             genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
+            self.model = genai.GenerativeModel("gemini-2.0-flash-exp")
         else:
             self.model = None
     
+    def generate_factual_response(self, query: str) -> Dict:
+        """Generate a factual response for knowledge-based questions"""
+        if not self.model:
+            return {
+                'response': "API service not properly configured. Please check your API keys.",
+                'error': True
+            }
+        
+        try:
+            prompt = f"""
+            You are a knowledgeable scholar of the Bhagavad Gita. Answer this factual question concisely and accurately:
+            
+            Question: {query}
+            
+            Guidelines:
+            - Provide a direct, factual answer in 2-4 sentences
+            - Include one relevant verse reference if applicable
+            - Keep the response informative but brief
+            - Use a scholarly but accessible tone
+            - Focus on facts rather than spiritual guidance
+            """
+            
+            response = self.model.generate_content(prompt)
+            
+            return {
+                'response': response.text,
+                'used_verses': [],
+                'themes': [],
+                'error': False
+            }
+            
+        except Exception as e:
+            return {
+                'response': f"I encountered a difficulty in providing information: {str(e)}",
+                'error': True
+            }
+    
     def generate_response(self, query: str, context: Dict) -> Dict:
-        """Generate response using the LLM"""
+        """Generate response using the LLM for guidance questions"""
         if not self.model:
             return {
                 'response': "API service not properly configured. Please check your API keys.",
@@ -163,12 +230,12 @@ class GitaLLMHandler:
 
 1. Be compassionate, wise, and gentle
 2. Draw from the philosophical teachings of the Gita
-3. Speak with the wisdom and authority of a spiritual teacher
-4. Use inclusive language that helps seekers of all backgrounds
-5. Provide practical guidance rooted in spiritual wisdom
-6. Always reference the relevant verses when possible
-7. Acknowledge human struggles with empathy
-8. Guide towards dharma (righteous action) and inner peace
+3. Provide practical guidance rooted in spiritual wisdom
+4. Reference the relevant verses when possible
+5. Acknowledge human struggles with empathy
+6. Guide towards dharma (righteous action) and inner peace
+7. Keep responses structured and reasonably concise
+8. Use bullet points or numbered lists when appropriate
 
 For serious mental health concerns, acknowledge the wisdom while also suggesting professional support."""
 
@@ -182,10 +249,11 @@ Relevant Bhagavad Gita Verses:
 Key Themes Identified: {', '.join(themes)}
 
 Based on these sacred teachings, provide a response that:
-1. Addresses the user's concern with compassion
-2. References the relevant verses naturally
-3. Provides actionable spiritual guidance
-4. Maintains the wisdom and tone of a spiritual teacher"""
+1. Addresses the user's concern with compassion (2-3 sentences)
+2. References the relevant verses naturally (1-2 key verses)
+3. Provides actionable spiritual guidance (3-4 practical points)
+4. Keeps the total response under 250 words
+5. Uses a structured format with clear sections"""
 
             response = self.model.generate_content(prompt)
             response_text = response.text
@@ -252,11 +320,15 @@ if verses:
         
         st.header("🎯 Example Questions")
         st.markdown("""
+        **Factual Questions:**
+        - "Who wrote the Bhagavad Gita?"
+        - "How many chapters are there?"
+        - "What is dharma?"
+        
+        **Guidance Questions:**
         - "I'm feeling stressed at work"
         - "How do I deal with failure?"
         - "What is my purpose in life?"
-        - "How to handle difficult relationships?"
-        - "I'm afraid of making decisions"
         """)
         
         st.header("⚠️ Disclaimer")
@@ -284,7 +356,7 @@ if verses:
         query = st.text_area(
             "What guidance do you seek?",
             value=st.session_state.current_query,
-            placeholder="Type your question here... (e.g., 'I'm feeling overwhelmed at work')",
+            placeholder="Type your question here... (e.g., 'I'm feeling overwhelmed at work' or 'Who wrote the Gita?')",
             height=100
         )
         
@@ -299,55 +371,72 @@ if verses:
         
         # Process query
         if submit_button and query.strip():
-            with st.spinner("🔍 Searching for relevant wisdom..."):
-                # Find relevant verses
-                relevant_verses = retriever.find_relevant_verses(query)
-                themes = retriever.extract_query_themes(query)
-                
-                # Create context
-                context_parts = []
-                for verse in relevant_verses:
-                    verse_text = f"Chapter {verse['chapter']}, Verse {verse['verse']}: {verse['text']}"
-                    context_parts.append(verse_text)
-                
-                context = {
-                    'formatted_context': '\n\n'.join(context_parts),
-                    'used_verses': relevant_verses,
-                    'query_themes': themes,
-                    'total_verses': len(relevant_verses)
-                }
+            # Determine question type
+            question_type = classify_question_type(query)
             
-            with st.spinner("💭 Generating guidance..."):
-                # Generate response
-                result = llm_handler.generate_response(query, context)
+            if question_type == 'factual':
+                # Handle factual questions without verse lookup
+                with st.spinner("📚 Generating information..."):
+                    result = llm_handler.generate_factual_response(query)
+                
+                # Display factual response
+                if not result.get('error'):
+                    st.markdown("### 📖 Information")
+                    st.markdown(result['response'])
+                else:
+                    st.error(f"Error generating response: {result['response']}")
             
-            # Display response
-            if not result.get('error'):
-                st.markdown("### 🌟 Guidance")
-                st.markdown(result['response'])
-                
-                # Show relevant verses
-                if context.get('used_verses'):
-                    with st.expander("📖 Relevant Verses Referenced", expanded=False):
-                        for verse in context['used_verses']:
-                            st.markdown(f"""
-                            **Chapter {verse['chapter']}, Verse {verse['verse']}**  
-                            *Theme: {verse.get('theme', 'General')}*
-                            
-                            {verse['text']}
-                            
-                            ---
-                            """)
-                
-                # Show themes
-                if context.get('query_themes'):
-                    st.markdown("### 🎭 Key Themes")
-                    theme_cols = st.columns(len(context['query_themes']))
-                    for i, theme in enumerate(context['query_themes']):
-                        with theme_cols[i]:
-                            st.markdown(f"**{theme.title()}**")
             else:
-                st.error(f"Error generating response: {result['response']}")
+                # Handle guidance questions with verse lookup (existing logic)
+                with st.spinner("🔍 Searching for relevant wisdom..."):
+                    # Find relevant verses
+                    relevant_verses = retriever.find_relevant_verses(query)
+                    themes = retriever.extract_query_themes(query)
+                    
+                    # Create context
+                    context_parts = []
+                    for verse in relevant_verses:
+                        verse_text = f"Chapter {verse['chapter']}, Verse {verse['verse']}: {verse['text']}"
+                        context_parts.append(verse_text)
+                    
+                    context = {
+                        'formatted_context': '\n\n'.join(context_parts),
+                        'used_verses': relevant_verses,
+                        'query_themes': themes,
+                        'total_verses': len(relevant_verses)
+                    }
+                
+                with st.spinner("💭 Generating guidance..."):
+                    # Generate response
+                    result = llm_handler.generate_response(query, context)
+                
+                # Display guidance response
+                if not result.get('error'):
+                    st.markdown("### 🌟 Guidance")
+                    st.markdown(result['response'])
+                    
+                    # Show relevant verses
+                    if context.get('used_verses'):
+                        with st.expander("📖 Relevant Verses Referenced", expanded=False):
+                            for verse in context['used_verses']:
+                                st.markdown(f"""
+                                **Chapter {verse['chapter']}, Verse {verse['verse']}**  
+                                *Theme: {verse.get('theme', 'General')}*
+                                
+                                {verse['text']}
+                                
+                                ---
+                                """)
+                    
+                    # Show themes
+                    if context.get('query_themes'):
+                        st.markdown("### 🎭 Key Themes")
+                        theme_cols = st.columns(len(context['query_themes']))
+                        for i, theme in enumerate(context['query_themes']):
+                            with theme_cols[i]:
+                                st.markdown(f"**{theme.title()}**")
+                else:
+                    st.error(f"Error generating response: {result['response']}")
         
         elif submit_button:
             st.warning("Please enter a question to receive guidance.")
@@ -355,7 +444,31 @@ if verses:
     with tab2:
         st.markdown("### 🎯 Try These Sample Questions")
         
-        sample_queries = [
+        # Factual questions
+        st.markdown("#### 📖 Factual Questions")
+        factual_queries = [
+            "Who wrote the Bhagavad Gita?",
+            "How many chapters are in the Gita?",
+            "What is dharma according to the Gita?"
+        ]
+        
+        for i, sample_query in enumerate(factual_queries):
+            if st.button(sample_query, key=f"factual_{i}"):
+                # Process factual query directly
+                with st.spinner("📚 Generating information..."):
+                    result = llm_handler.generate_factual_response(sample_query)
+                
+                # Display the question and response
+                st.markdown(f"**Question:** {sample_query}")
+                
+                if not result.get('error'):
+                    st.markdown("### 📖 Information")
+                    st.markdown(result['response'])
+                else:
+                    st.error(f"Error generating response: {result['response']}")
+        
+        st.markdown("#### 🌟 Guidance Questions")
+        guidance_queries = [
             "I'm feeling depressed and lost",
             "How do I handle work stress?",
             "What should I do when I fail?",
@@ -363,9 +476,9 @@ if verses:
             "How to deal with difficult people?"
         ]
         
-        for i, sample_query in enumerate(sample_queries):
-            if st.button(sample_query, key=f"sample_{i}"):
-                # Process the sample query directly
+        for i, sample_query in enumerate(guidance_queries):
+            if st.button(sample_query, key=f"guidance_{i}"):
+                # Process the sample query directly with verse lookup
                 with st.spinner("🔍 Searching for relevant wisdom..."):
                     # Find relevant verses
                     relevant_verses = retriever.find_relevant_verses(sample_query)
