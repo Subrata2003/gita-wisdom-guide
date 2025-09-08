@@ -58,7 +58,7 @@ st.markdown("""
         /* Lighter main overlay for image clarity */
         linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), 
         url('https://raw.githubusercontent.com/Subrata2003/gita-wisdom-guide/main/assets/krishna_background.jpg');
-    background-size: 800px auto;
+    background-size: 1000px auto;
     background-position: center center;
     background-attachment: fixed;
     background-repeat: no-repeat;
