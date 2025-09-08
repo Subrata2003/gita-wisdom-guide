@@ -42,116 +42,326 @@ def classify_question_type(query: str) -> str:
     
     return 'guidance'  # Default to guidance mode
 
-# Simple and clean CSS with Krishna background
+# Enhanced CSS with cosmic theme and transparency
 st.markdown("""
 <style>
-/* Main app background with Krishna image */
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Main app background with enhanced cosmic Krishna image */
 .stApp {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                url('https://raw.githubusercontent.com/Subrata2003/gita-wisdom-guide/main/assets/krishna_background.jpg');
+    background: 
+        /* Multiple overlay gradients for depth */
+        radial-gradient(circle at 20% 80%, rgba(120, 0, 150, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 100, 200, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 100, 0, 0.2) 0%, transparent 50%),
+        /* Main image */
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), 
+        url('https://raw.githubusercontent.com/Subrata2003/gita-wisdom-guide/main/assets/krishna_background.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
 }
 
-/* Main container */
+/* Remove default Streamlit padding */
 .main .block-container {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    max-width: none;
+}
+
+/* Hide Streamlit header and footer */
+header[data-testid="stHeader"] {
+    display: none;
+}
+
+footer {
+    display: none;
+}
+
+/* Main container with glassmorphism */
+.main .block-container {
+    background: rgba(15, 5, 30, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
     padding: 2rem;
     margin: 1rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Headers */
+/* Headers with cosmic styling */
 h1 {
-    color: #ff6b35 !important;
-    text-align: center;
-    font-weight: bold;
+    font-family: 'Cinzel', serif !important;
+    background: linear-gradient(45deg, #FFD700, #FF6B35, #E74C3C, #9B59B6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    font-size: 3.5rem !important;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
+    margin-bottom: 0.5rem !important;
 }
 
 h2, h3, h4 {
-    color: #2c3e50 !important;
+    font-family: 'Cinzel', serif !important;
+    color: #FFD700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important;
 }
 
-/* Buttons */
+/* Subtitle styling */
+.stApp p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Buttons with cosmic glow */
 .stButton > button {
-    background: #ff6b35;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
-    font-weight: 600;
-    width: 100%;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 15px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-family: 'Poppins', sans-serif !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .stButton > button:hover {
-    background: #e55a30;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Text areas */
+/* Text areas with glassmorphism */
 .stTextArea textarea {
-    border: 2px solid #ff6b35 !important;
-    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    border-radius: 15px !important;
+    color: white !important;
     font-size: 16px !important;
+    font-family: 'Poppins', sans-serif !important;
+    padding: 1rem !important;
 }
 
-/* Sidebar */
+.stTextArea textarea:focus {
+    border-color: rgba(255, 215, 0, 0.6) !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.stTextArea textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Sidebar styling */
 .css-1d391kg {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(15, 5, 30, 0.9) !important;
+    backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Tabs */
+.css-1d391kg .stMarkdown {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Tabs with cosmic styling */
 .stTabs [data-baseweb="tab-list"] {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    padding: 5px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(15px) !important;
+    border-radius: 15px !important;
+    padding: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .stTabs [data-baseweb="tab"] {
-    color: #2c3e50 !important;
-    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 600 !important;
+    font-family: 'Poppins', sans-serif !important;
+    border-radius: 10px !important;
+    transition: all 0.3s ease !important;
 }
 
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: #ff6b35 !important;
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
     color: white !important;
 }
 
-/* Response containers */
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* Response containers with enhanced glassmorphism */
 .stMarkdown {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 10px 0;
-    border-left: 4px solid #ff6b35;
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(15px) !important;
+    padding: 20px !important;
+    border-radius: 15px !important;
+    margin: 15px 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-left: 4px solid #FFD700 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-family: 'Poppins', sans-serif !important;
 }
 
-/* Expander */
+/* Expander styling */
 .streamlit-expanderHeader {
-    background: #f8f9fa !important;
-    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+    color: #FFD700 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Metrics */
+.streamlit-expanderContent {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Metrics with cosmic glow */
 div[data-testid="metric-container"] {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 10px;
-    border: 2px solid #ff6b35;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2) !important;
+}
+
+div[data-testid="metric-container"] [data-testid="metric-value"] {
+    color: #FFD700 !important;
+    font-family: 'Cinzel', serif !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="metric-container"] [data-testid="metric-label"] {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Spinner styling */
+.stSpinner > div {
+    border-top-color: #FFD700 !important;
+}
+
+/* Warning and error boxes */
+.stAlert {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Success message styling */
+.stSuccess {
+    background: rgba(0, 255, 0, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 255, 0, 0.3) !important;
+}
+
+/* Info message styling */
+.stInfo {
+    background: rgba(0, 100, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 100, 255, 0.3) !important;
+}
+
+/* Error message styling */
+.stError {
+    background: rgba(255, 0, 0, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.7);
+}
+
+/* Column spacing */
+.row-widget.stHorizontal {
+    gap: 1rem;
+}
+
+/* Hide streamlit menu */
+#MainMenu {
+    visibility: hidden;
+}
+
+/* Add subtle animation to the whole app */
+.stApp {
+    animation: cosmic-glow 10s ease-in-out infinite alternate;
+}
+
+@keyframes cosmic-glow {
+    0% {
+        filter: brightness(1) contrast(1);
+    }
+    100% {
+        filter: brightness(1.05) contrast(1.1);
+    }
+}
+
+/* Sample question buttons special styling */
+button[kind="secondary"] {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+button[kind="secondary"]:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 215, 0, 0.4) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2) !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# Enhanced header with cosmic styling
 st.markdown("""
-<div style="text-align: center; padding: 2rem 0;">
-    <h1 style="color: #ff6b35; font-size: 3rem; margin-bottom: 0;">🕉️ Gita Wisdom Guide</h1>
-    <p style="font-size: 1.2rem; color: #666; margin-top: 0;">
+<div style="text-align: center; padding: 2rem 0; margin-bottom: 1rem;">
+    <h1 style="font-family: 'Cinzel', serif; font-size: 4rem; margin-bottom: 0.5rem;">
+        🕉️ Gita Wisdom Guide
+    </h1>
+    <p style="font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-top: 0; font-family: 'Poppins', sans-serif; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);">
         Discover timeless wisdom from the Bhagavad Gita for modern life challenges
     </p>
+    <div style="width: 100px; height: 3px; background: linear-gradient(90deg, #FFD700, #FF6B35); margin: 1rem auto; border-radius: 2px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -393,9 +603,9 @@ if verses:
     retriever = GitaRetriever(verses)
     llm_handler = GitaLLMHandler()
     
-    # Sidebar
+    # Sidebar with enhanced styling
     with st.sidebar:
-        st.header("📚 About")
+        st.markdown("### 📚 About")
         st.markdown("""
         This guide draws wisdom from the **Bhagavad Gita** to help you navigate life's challenges with spiritual insight.
         
@@ -405,11 +615,11 @@ if verses:
         3. Receive guidance inspired by Krishna's teachings
         """)
         
-        st.header("📊 Database Info")
+        st.markdown("### 📊 Database Info")
         st.metric("Total Verses", len(verses))
         st.metric("Chapters", "18")
         
-        st.header("🎯 Example Questions")
+        st.markdown("### 🎯 Example Questions")
         st.markdown("""
         **Factual Questions:**
         - "Who wrote the Bhagavad Gita?"
@@ -422,7 +632,7 @@ if verses:
         - "What is my purpose in life?"
         """)
         
-        st.header("⚠️ Disclaimer")
+        st.markdown("### ⚠️ Disclaimer")
         st.markdown("""
         This tool provides spiritual guidance based on the Bhagavad Gita. 
         For serious mental health concerns, please consult a qualified professional.
@@ -431,7 +641,7 @@ if verses:
         st.markdown("---")
         st.markdown("""
         <div style="text-align: center; padding: 1rem 0;">
-            <p style="color: #666; font-size: 0.9rem;">
+            <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
                 Made with ❤️ by <strong>Subrata</strong>
             </p>
         </div>
