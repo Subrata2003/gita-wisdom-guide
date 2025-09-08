@@ -23,7 +23,7 @@ def classify_question_type(query: str) -> str:
         'who is krishna', 'who is arjuna', 'what is dharma', 'what is karma',
         'when did', 'where was', 'what does', 'define', 'explain',
         'how many', 'which chapter', 'what chapter', 'tell me about',
-        'who said', 'what is the story', 'summary of', 'overview of'
+        'who said', 'what is the story', 'summary of', 'overview of', 'who is', 'what is'
     ]
     
     # Check for factual patterns
@@ -42,295 +42,114 @@ def classify_question_type(query: str) -> str:
     
     return 'guidance'  # Default to guidance mode
 
-# Custom CSS for Krishna-themed UI
+# Simple and clean CSS with Krishna background
 st.markdown("""
 <style>
-/* Import Google Fonts for better typography */
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap');
-
-/* Hide Streamlit branding */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
-/* Main app background */
+/* Main app background with Krishna image */
 .stApp {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-}
-
-/* Main container background with Krishna image */
-.main .block-container {
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), 
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                 url('https://raw.githubusercontent.com/Subrata2003/gita-wisdom-guide/main/assets/krishna_background.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    background-repeat: no-repeat;
-    border-radius: 20px;
+}
+
+/* Main container */
+.main .block-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
     padding: 2rem;
     margin: 1rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    min-height: 90vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Content containers with glassmorphism effect */
-.stTabs [data-baseweb="tab-list"] {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px;
-    margin-bottom: 20px;
+/* Headers */
+h1 {
+    color: #ff6b35 !important;
+    text-align: center;
+    font-weight: bold;
 }
 
-.stTabs [data-baseweb="tab"] {
-    background: transparent;
-    color: white !important;
-    font-weight: 500;
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    padding: 12px 20px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.stTabs [data-baseweb="tab"]:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: rgba(255, 107, 53, 0.8);
-    color: white !important;
-}
-
-/* Text areas and inputs */
-.stTextArea textarea {
-    background: rgba(255, 255, 255, 0.95) !important;
-    border: 2px solid rgba(255, 255, 255, 0.4) !important;
-    border-radius: 15px !important;
+h2, h3, h4 {
     color: #2c3e50 !important;
-    font-family: 'Lora', serif;
-    font-size: 16px !important;
-    padding: 15px !important;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.stTextArea textarea:focus {
-    border-color: #ff6b35 !important;
-    box-shadow: 0 0 20px rgba(255, 107, 53, 0.4) !important;
-    background: rgba(255, 255, 255, 0.98) !important;
-}
-
-/* Primary buttons */
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 25px !important;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
-    padding: 0.6rem 2rem;
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
-    transition: all 0.3s ease;
-    font-size: 16px;
-}
-
-.stButton > button[kind="primary"]:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
-    background: linear-gradient(135deg, #f7931e, #ff6b35) !important;
-}
-
-/* Secondary buttons (sample questions) */
+/* Buttons */
 .stButton > button {
-    background: rgba(255, 255, 255, 0.9) !important;
-    color: #2c3e50 !important;
-    border: 2px solid rgba(255, 107, 53, 0.4) !important;
-    border-radius: 20px !important;
-    font-family: 'Poppins', sans-serif;
-    margin: 8px 0;
-    padding: 0.5rem 1.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
+    background: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
     width: 100%;
+    transition: all 0.3s ease;
 }
 
 .stButton > button:hover {
-    background: rgba(255, 107, 53, 0.15) !important;
-    border-color: #ff6b35 !important;
+    background: #e55a30;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Text areas */
+.stTextArea textarea {
+    border: 2px solid #ff6b35 !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+}
+
+/* Sidebar */
+.css-1d391kg {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: #ff6b35 !important;
+    color: white !important;
 }
 
 /* Response containers */
-div[data-testid="stMarkdownContainer"] {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 15px 0;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-}
-
-/* Headers and text styling */
-h1 {
-    color: white !important;
-    font-family: 'Poppins', sans-serif !important;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
-    font-weight: 600;
-    text-align: center;
-}
-
-h2, h3, h4, h5, h6 {
-    color: #2c3e50 !important;
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 600;
-}
-
-.stMarkdown p {
-    color: #2c3e50 !important;
-    font-family: 'Lora', serif;
-    line-height: 1.7;
-    font-size: 16px;
-}
-
-.stMarkdown strong {
-    color: #ff6b35 !important;
-    font-weight: 600;
-}
-
-/* Sidebar styling */
-.css-1d391kg, .css-1lcbmhc {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(15px);
-    border-right: 2px solid rgba(255, 107, 53, 0.3);
-}
-
-.css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3 {
-    color: #2c3e50 !important;
-    text-shadow: none;
-}
-
-/* Expander styling */
-.streamlit-expanderHeader {
-    background: rgba(255, 255, 255, 0.2) !important;
-    border-radius: 12px;
-    color: white !important;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.streamlit-expanderContent {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 10px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Metrics styling */
-div[data-testid="metric-container"] {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
+.stMarkdown {
+    background: white;
     padding: 15px;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
     margin: 10px 0;
+    border-left: 4px solid #ff6b35;
 }
 
-div[data-testid="metric-container"] label {
-    color: #2c3e50 !important;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
+/* Expander */
+.streamlit-expanderHeader {
+    background: #f8f9fa !important;
+    border-radius: 5px;
 }
 
-div[data-testid="metric-container"] div {
-    color: #ff6b35 !important;
-    font-size: 24px !important;
-    font-weight: 600;
-}
-
-/* Alert messages */
-.stAlert {
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 12px;
-    border: none !important;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Spinner styling */
-.stSpinner {
-    color: #ff6b35 !important;
-}
-
-/* Column styling for themes */
-.stColumns {
-    gap: 15px;
-}
-
-/* Success/Error message styling */
-.stSuccess {
-    background: rgba(40, 167, 69, 0.9) !important;
-    color: white !important;
+/* Metrics */
+div[data-testid="metric-container"] {
+    background: #f8f9fa;
     border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.stError {
-    background: rgba(220, 53, 69, 0.9) !important;
-    color: white !important;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.stWarning {
-    background: rgba(255, 193, 7, 0.9) !important;
-    color: #2c3e50 !important;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 107, 53, 0.7);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 107, 53, 0.9);
+    padding: 10px;
+    border: 2px solid #ff6b35;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Enhanced header with Krishna theme
 st.markdown("""
-<div style="text-align: center; padding: 2rem 0; margin-bottom: 2rem;">
-    <h1 style="color: white; font-size: 3.5rem; margin-bottom: 0; 
-               text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
-               font-family: 'Poppins', sans-serif; font-weight: 600;">
-        🕉️ Gita Wisdom Guide
-    </h1>
-    <p style="font-size: 1.3rem; color: rgba(255, 255, 255, 0.95); margin-top: 10px;
-              text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-              font-family: 'Lora', serif; font-style: italic;">
+<div style="text-align: center; padding: 2rem 0;">
+    <h1 style="color: #ff6b35; font-size: 3rem; margin-bottom: 0;">🕉️ Gita Wisdom Guide</h1>
+    <p style="font-size: 1.2rem; color: #666; margin-top: 0;">
         Discover timeless wisdom from the Bhagavad Gita for modern life challenges
     </p>
 </div>
@@ -612,7 +431,7 @@ if verses:
         st.markdown("---")
         st.markdown("""
         <div style="text-align: center; padding: 1rem 0;">
-            <p style="color: #ff6b35; font-size: 0.9rem; font-weight: 600;">
+            <p style="color: #666; font-size: 0.9rem;">
                 Made with ❤️ by <strong>Subrata</strong>
             </p>
         </div>
