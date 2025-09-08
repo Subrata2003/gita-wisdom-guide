@@ -357,14 +357,14 @@ button[kind="secondary"]:hover {
 
 # Enhanced header with moonlit cosmic styling
 st.markdown("""
-<div style="text-align: center; padding: 2rem 0; margin-bottom: 1rem;">
-    <h1 style="font-family: 'Cinzel', serif; font-size: 4rem; margin-bottom: 0.5rem;">
+<div style="text-align: center; padding: 1rem 0 2rem 0; margin: 0; margin-bottom: 1rem;">
+    <h1 style="font-family: 'Cinzel', serif; font-size: 4rem; margin: 0; margin-bottom: 0.5rem;">
         🕉️ Gita Wisdom Guide
     </h1>
-    <p style="font-size: 1.3rem; color: rgba(255, 255, 255, 0.95); margin-top: 0; font-family: 'Poppins', sans-serif; text-shadow: 0 0 15px rgba(135, 206, 235, 0.4);">
+    <p style="font-size: 1.3rem; color: rgba(255, 255, 255, 0.95); margin: 0; font-family: 'Poppins', sans-serif; text-shadow: 0 0 15px rgba(135, 206, 235, 0.4);">
         Discover timeless wisdom from the Bhagavad Gita for modern life challenges
     </p>
-    <div style="width: 100px; height: 3px; background: linear-gradient(90deg, #87CEEB, #4682B4); margin: 1rem auto; border-radius: 2px; box-shadow: 0 0 15px rgba(135, 206, 235, 0.5);"></div>
+    <div style="width: 100px; height: 3px; background: linear-gradient(90deg, #87CEEB, #4682B4); margin: 1rem auto 0 auto; border-radius: 2px; box-shadow: 0 0 15px rgba(135, 206, 235, 0.5);"></div>
 </div>
 """, unsafe_allow_html=True)
 
