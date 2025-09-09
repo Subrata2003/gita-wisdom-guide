@@ -167,15 +167,72 @@ h2, h3, h4 {
     color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Sidebar styling */
+/* Sidebar with consistent dark styling for both light and dark modes */
 .css-1d391kg {
-    background: rgba(15, 5, 30, 0.9) !important;
-    backdrop-filter: blur(20px) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(0, 20, 40, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    border-right: 1px solid rgba(135, 206, 235, 0.2) !important;
 }
 
+/* Force all sidebar text to be light colored */
 .css-1d391kg .stMarkdown {
     color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.css-1d391kg .stMarkdown h1,
+.css-1d391kg .stMarkdown h2,
+.css-1d391kg .stMarkdown h3,
+.css-1d391kg .stMarkdown h4 {
+    color: #87CEEB !important;
+}
+
+.css-1d391kg .stMarkdown p {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.css-1d391kg .stMarkdown strong {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.css-1d391kg .stMarkdown ul,
+.css-1d391kg .stMarkdown ol {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.css-1d391kg .stMarkdown li {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Alternative sidebar selector for different Streamlit versions */
+section[data-testid="stSidebar"] {
+    background: rgba(0, 20, 40, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    border-right: 1px solid rgba(135, 206, 235, 0.2) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown h1,
+section[data-testid="stSidebar"] .stMarkdown h2,
+section[data-testid="stSidebar"] .stMarkdown h3,
+section[data-testid="stSidebar"] .stMarkdown h4 {
+    color: #87CEEB !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown p {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown strong {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown ul,
+section[data-testid="stSidebar"] .stMarkdown ol,
+section[data-testid="stSidebar"] .stMarkdown li {
+    color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Tabs with cosmic styling */
