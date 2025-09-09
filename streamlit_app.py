@@ -145,25 +145,50 @@ h2, h3, h4 {
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Text areas with glassmorphism */
+/* Text areas with enhanced dark styling for both light and dark modes */
 .stTextArea textarea {
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(10px) !important;
-    border: 2px solid rgba(255, 215, 0, 0.3) !important;
+    background: rgba(0, 20, 40, 0.85) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 2px solid rgba(135, 206, 235, 0.3) !important;
     border-radius: 15px !important;
-    color: white !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 16px !important;
+    font-family: 'Poppins', sans-serif !important;
+    padding: 1rem !important;
+    box-shadow: 0 0 20px rgba(135, 206, 235, 0.1) !important;
+}
+
+.stTextArea textarea:focus {
+    border-color: rgba(135, 206, 235, 0.6) !important;
+    box-shadow: 0 0 25px rgba(135, 206, 235, 0.3) !important;
+    background: rgba(0, 20, 40, 0.9) !important;
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.stTextArea textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Additional selector for different Streamlit versions */
+div[data-testid="stTextArea"] textarea {
+    background: rgba(0, 20, 40, 0.85) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 2px solid rgba(135, 206, 235, 0.3) !important;
+    border-radius: 15px !important;
+    color: rgba(255, 255, 255, 0.95) !important;
     font-size: 16px !important;
     font-family: 'Poppins', sans-serif !important;
     padding: 1rem !important;
 }
 
-.stTextArea textarea:focus {
-    border-color: rgba(255, 215, 0, 0.6) !important;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3) !important;
-    background: rgba(255, 255, 255, 0.15) !important;
+div[data-testid="stTextArea"] textarea:focus {
+    border-color: rgba(135, 206, 235, 0.6) !important;
+    box-shadow: 0 0 25px rgba(135, 206, 235, 0.3) !important;
+    background: rgba(0, 20, 40, 0.9) !important;
+    color: rgba(255, 255, 255, 1) !important;
 }
 
-.stTextArea textarea::placeholder {
+div[data-testid="stTextArea"] textarea::placeholder {
     color: rgba(255, 255, 255, 0.6) !important;
 }
 
