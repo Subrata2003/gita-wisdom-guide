@@ -804,8 +804,20 @@ if verses:
         if submit_button and query.strip():
             # Determine question type
             question_type = classify_question_type(query)
+
+            if question_type == 'greeting':
+                # Handle greetings with short response
+                with st.spinner("🙏 Greeting..."):
+                    result = llm_handler.generate_greeting_response(query)
+                
+                # Display greeting response
+                if not result.get('error'):
+                    st.markdown("### 🙏 Welcome")
+                    st.markdown(result['response'])
+                else:
+                    st.error(f"Error generating response: {result['response']}")
             
-            if question_type == 'factual':
+            elif question_type == 'factual':
                 # Handle factual questions without verse lookup
                 with st.spinner("📚 Generating information..."):
                     result = llm_handler.generate_factual_response(query)
