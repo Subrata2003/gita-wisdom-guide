@@ -14,23 +14,33 @@ from typing import List, Dict, Optional
 
 def classify_question_type(query: str) -> str:
     """Classify the type of question being asked"""
-    query_lower = query.lower()
+    query_lower = query.lower().strip()
     
-    # Factual question patterns
+    # Greeting patterns
+    greeting_patterns = [
+        'hello', 'hi', 'hey', 'greetings', 'namaste', 'good morning', 
+        'good afternoon', 'good evening', 'how are you', 'what\'s up',
+        'hey there', 'hola', 'salaam', 'om', 'pranam'
+    ]
+    
+    # Check for greetings first
+    if any(pattern in query_lower for pattern in greeting_patterns):
+        return 'greeting'
+    
+    # Factual question patterns (keep existing)
     factual_patterns = [
         'who wrote', 'who is the author', 'when was written', 'when was composed',
         'how many chapters', 'how many verses', 'what is the meaning of',
         'who is krishna', 'who is arjuna', 'what is dharma', 'what is karma',
         'when did', 'where was', 'what does', 'define', 'explain',
         'how many', 'which chapter', 'what chapter', 'tell me about',
-        'who said', 'what is the story', 'summary of', 'overview of', 'who ', 'what'
+        'who said', 'what is the story', 'summary of', 'overview of', 'who is', 'what is', 'who'
     ]
     
-    # Check for factual patterns
     if any(pattern in query_lower for pattern in factual_patterns):
         return 'factual'
     
-    # Personal guidance patterns
+    # Personal guidance patterns (keep existing)
     guidance_patterns = [
         'i am', 'i feel', 'how do i', 'help me', 'what should i do',
         'i\'m feeling', 'i\'m confused', 'i\'m struggling', 'advice',
@@ -562,6 +572,41 @@ class GitaLLMHandler:
             self.model = genai.GenerativeModel("gemini-2.5-flash-lite")
         else:
             self.model = None
+
+    def generate_greeting_response(self, query: str) -> Dict:
+        """Generate a warm greeting response"""
+        if not self.model:
+            return {
+                'response': "Namaste! Welcome to the Gita Wisdom Guide. How may I assist you on your spiritual journey today?",
+                'error': False
+            }
+        
+        try:
+            prompt = f"""
+            You are a wise spiritual guide inspired by Krishna's teachings. Someone has greeted you with: "{query}"
+            
+            Respond with a warm, brief greeting (2-3 sentences) that:
+            - Acknowledges their greeting warmly
+            - Welcomes them to seek wisdom from the Bhagavad Gita
+            - Invites them to ask questions
+            - Uses spiritual greetings like "Namaste" when appropriate
+            - Keeps the tone welcoming but concise
+            """
+            
+            response = self.model.generate_content(prompt)
+            
+            return {
+                'response': response.text,
+                'used_verses': [],
+                'themes': [],
+                'error': False
+            }
+            
+        except Exception as e:
+            return {
+                'response': "Namaste! Welcome to the Gita Wisdom Guide. I'm here to help you find wisdom from Krishna's teachings. What would you like to know?",
+                'error': False
+            }
     
     def generate_factual_response(self, query: str) -> Dict:
         """Generate a factual response for knowledge-based questions"""
