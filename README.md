@@ -189,17 +189,6 @@ curl -X POST http://localhost:8000/api/query \
 | Session | In-memory per-process (UUID keyed) |
 
 ---
-
-## Roadmap
-
-- [ ] User authentication (JWT) + persistent login
-- [ ] Database-backed session storage (PostgreSQL / SQLite)
-- [ ] Conversation history UI in sidebar
-- [ ] Verse bookmarking and personal notes
-- [ ] Chapter browser page
-
----
-
 ## License
 
 MIT — see [LICENSE](LICENSE)
