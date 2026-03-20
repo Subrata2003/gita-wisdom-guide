@@ -1,197 +1,129 @@
-#!/usr/bin/env python3
 """
-Setup script for Gita Wisdom Guide
-This script processes the data and initializes the vector database
+Gita Wisdom Guide — First-time setup
+Run once before starting the backend for the first time:
+    python setup.py
+
+What this does:
+1. Processes raw Gita verses into structured documents
+2. Creates and indexes the ChromaDB vector database
+3. Verifies the system is ready
 """
 
-import os
 import sys
-import json
+import os
 from pathlib import Path
 
-# Add src directory to path
-sys.path.append('src')
+ROOT = Path(__file__).parent
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
-from src.data_processor import GitaDataProcessor
-from src.vector_store import GitaVectorStore
 
-def create_directories():
-    """Create necessary directories"""
-    directories = ['data', 'vector_db', 'logs']
-    for directory in directories:
-        Path(directory).mkdir(exist_ok=True)
-        print(f"✓ Created directory: {directory}")
+def step(msg: str):
+    print(f"\n>>> {msg}")
 
-def check_data_files():
-    """Check if data files exist"""
-    required_files = [
-        'data/reformatted_bhagavad_gita.json',
-        # Add other required files here
-    ]
-    
-    missing_files = []
-    for file_path in required_files:
-        if not Path(file_path).exists():
-            missing_files.append(file_path)
-    
-    if missing_files:
-        print("❌ Missing required data files:")
-        for file in missing_files:
-            print(f"   - {file}")
-        print("\nPlease ensure your Bhagavad Gita JSON file is in the data/ directory")
-        return False
-    
-    print("✓ All required data files found")
-    return True
 
-def process_gita_data():
-    """Process the Bhagavad Gita data"""
-    print("📚 Processing Bhagavad Gita data...")
-    
-    try:
-        processor = GitaDataProcessor()
-        
-        # Process the data
-        processed_data = processor.process_complete_dataset(
-            'data/reformatted_bhagavad_gita.json',
-            'data/processed_gita_data.json'
-        )
-        
-        # Get and display statistics
-        stats = processor.get_statistics()
-        print("\n📊 Dataset Statistics:")
-        for key, value in stats.items():
-            if isinstance(value, list):
-                print(f"   {key}: {', '.join(value)}")
-            else:
-                print(f"   {key}: {value}")
-        
-        print(f"✓ Processed {len(processed_data)} documents")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error processing data: {str(e)}")
-        return False
-
-def initialize_vector_database():
-    """Initialize the vector database"""
-    print("\n🔍 Initializing vector database...")
-    
-    try:
-        # Check if processed data exists
-        if not Path('data/processed_gita_data.json').exists():
-            print("❌ Processed data file not found. Please run data processing first.")
-            return False
-        
-        # Initialize vector store
-        vector_store = GitaVectorStore()
-        
-        # Load and index data
-        vector_store.load_and_index_data('data/processed_gita_data.json')
-        
-        # Get collection info
-        info = vector_store.get_collection_info()
-        print(f"✓ Vector database initialized with {info['document_count']} documents")
-        
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error initializing vector database: {str(e)}")
-        return False
-
-def check_api_keys():
-    """Check if API keys are configured"""
-    print("\n🔑 Checking API configuration...")
-    
-    # Load environment variables
+def check_env():
+    step("Checking environment")
     from dotenv import load_dotenv
-    load_dotenv()
-    
-    google_key = os.getenv('GOOGLE_API_KEY')
-    openai_key = os.getenv('OPENAI_API_KEY')
-    
-    if not google_key and not openai_key:
-        print("⚠️  Warning: No API keys found")
-        print("   Please set GOOGLE_API_KEY or OPENAI_API_KEY in your .env file")
-        print("   You can get a free Gemini API key from: https://makersuite.google.com/app/apikey")
-        return False
-    
-    if google_key:
-        print("✓ Google/Gemini API key found")
-    if openai_key:
-        print("✓ OpenAI API key found")
-    
-    return True
+    load_dotenv(ROOT / ".env")
 
-def test_system():
-    """Test the complete system"""
-    print("\n🧪 Testing system...")
-    
-    try:
-        from src.vector_store import GitaVectorStore
-        from src.retrieval import GitaRetriever
-        from src.llm_handler import GitaLLMHandler
-        
-        # Test vector store
-        vector_store = GitaVectorStore()
-        info = vector_store.get_collection_info()
-        print(f"✓ Vector store: {info['document_count']} documents")
-        
-        # Test retrieval
-        retriever = GitaRetriever(vector_store)
-        test_query = "how to find peace"
-        context = retriever.create_context_for_llm(test_query)
-        print(f"✓ Retrieval: Found {context['total_verses']} relevant verses")
-        
-        # Test LLM (if API key available)
-        if os.getenv('GOOGLE_API_KEY') or os.getenv('OPENAI_API_KEY'):
-            llm_handler = GitaLLMHandler()
-            print("✓ LLM handler initialized")
-        else:
-            print("⚠️  LLM handler not tested (no API key)")
-        
-        return True
-        
-    except Exception as e:
-        print(f"❌ System test failed: {str(e)}")
-        return False
+    api_key = os.getenv("GOOGLE_API_KEY", "")
+    if not api_key or api_key == "your_google_api_key_here":
+        print("  WARNING: GOOGLE_API_KEY is not set in .env")
+        print("  Get a free key at https://aistudio.google.com/")
+        print("  The vector store will still be built; only LLM responses will fail.")
+    else:
+        print(f"  GOOGLE_API_KEY: set ({api_key[:8]}...)")
 
-def main():
-    """Main setup function"""
-    print("🕉️  Gita Wisdom Guide Setup")
-    print("=" * 40)
-    
-    # Step 1: Create directories
-    create_directories()
-    
-    # Step 2: Check data files
-    if not check_data_files():
+
+def process_data():
+    step("Processing Gita verses")
+    from data_processor import GitaDataProcessor
+
+    raw_path = ROOT / "data" / "reformatted_bhagavad_gita.json"
+    out_path = ROOT / "data" / "processed_gita_data.json"
+
+    if not raw_path.exists():
+        print(f"  ERROR: {raw_path} not found.")
         sys.exit(1)
-    
-    # Step 3: Process data
-    if not process_gita_data():
+
+    if out_path.exists():
+        print(f"  processed_gita_data.json already exists — skipping re-processing.")
+        print("  (Delete data/processed_gita_data.json to force re-processing)")
+        return
+
+    processor = GitaDataProcessor()
+    processor.process_complete_dataset(str(raw_path), str(out_path))
+    stats = processor.get_statistics()
+    print(f"  Verses processed : {stats['total_verses']}")
+    print(f"  Chunks created   : {stats['total_chunks']}")
+    print(f"  Chapters         : {stats['total_chapters']}")
+
+
+def build_vector_store():
+    step("Building vector database")
+    from vector_store import GitaVectorStore
+    from backend.config import settings
+
+    processed_path = ROOT / "data" / "processed_gita_data.json"
+    if not processed_path.exists():
+        print("  ERROR: processed_gita_data.json not found. Run process_data() first.")
         sys.exit(1)
-    
-    # Step 4: Initialize vector database
-    if not initialize_vector_database():
-        sys.exit(1)
-    
-    # Step 5: Check API keys
-    api_configured = check_api_keys()
-    
-    # Step 6: Test system
-    if not test_system():
-        sys.exit(1)
-    
-    # Success message
-    print("\n" + "=" * 40)
-    print("🎉 Setup completed successfully!")
-    print("\nNext steps:")
-    print("1. If you haven't already, set your API key in .env file")
-    print("2. Run the application: streamlit run src/app.py")
-    
-    if not api_configured:
-        print("\n⚠️  Note: You'll need to configure an API key to use the LLM features")
+
+    vs = GitaVectorStore(
+        collection_name=settings.COLLECTION_NAME,
+        persist_directory=settings.VECTOR_DB_PATH,
+    )
+    existing = vs.get_collection_info().get("document_count", 0)
+
+    if existing > 0:
+        print(f"  Vector store already has {existing} documents — skipping re-indexing.")
+        print("  (To force rebuild: delete the vector_db/ folder and re-run setup.py)")
+        return
+
+    print(f"  Indexing {processed_path} into ChromaDB...")
+    vs.load_and_index_data(str(processed_path))
+    final_count = vs.get_collection_info().get("document_count", 0)
+    print(f"  Indexed {final_count} documents into {settings.VECTOR_DB_PATH}")
+
+
+def verify():
+    step("Verifying system")
+    from vector_store import GitaVectorStore
+    from backend.config import settings
+    from backend.core.enhanced_retrieval import EnhancedGitaRetriever
+
+    vs = GitaVectorStore(
+        collection_name=settings.COLLECTION_NAME,
+        persist_directory=settings.VECTOR_DB_PATH,
+    )
+    info = vs.get_collection_info()
+    print(f"  Documents  : {info['document_count']}")
+
+    retriever = EnhancedGitaRetriever(vs)
+    test_q = "How to find inner peace?"
+    results = retriever.retrieve_relevant_verses(test_q, max_results=3)
+    print(f"  Test query : '{test_q}'")
+    print(f"  Retrieved  : {len(results)} verses (scores: {[r['relevance_score'] for r in results]})")
+
+    if not results:
+        print("  WARNING: No results returned — something may be wrong with the index.")
+    else:
+        print("  System ready!")
+
 
 if __name__ == "__main__":
-    main()
+    print("=" * 55)
+    print("  Gita Wisdom Guide — Setup")
+    print("=" * 55)
+
+    check_env()
+    process_data()
+    build_vector_store()
+    verify()
+
+    print("\n" + "=" * 55)
+    print("  Setup complete!")
+    print("  Start the backend : start_backend.bat")
+    print("  Start the frontend: start_frontend.bat")
+    print("=" * 55)
