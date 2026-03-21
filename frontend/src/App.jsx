@@ -21,7 +21,7 @@ function WelcomeScreen({ onQuery }) {
       {/* Hero Om image — mix-blend-mode:multiply makes the cream bg invisible on dark navy */}
       <div className="animate-float mb-3 select-none" style={{ width: 192, height: 192 }}>
         <img
-          src="/images/hero-om.png"
+          src="/images/hero-om-V2.jpeg"
           alt="Om symbol"
           width={192}
           height={192}

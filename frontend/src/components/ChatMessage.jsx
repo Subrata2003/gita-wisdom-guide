@@ -34,11 +34,12 @@ export default function ChatMessage({ message }) {
   return (
     <div className="flex items-start gap-3 msg-enter">
       {/* Avatar */}
-      <div
-        className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-base
-                   bg-gradient-to-br from-saffron to-gold shadow-saffron"
-      >
-        🕉️
+      <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden shadow-saffron">
+        <img
+          src="/images/app-icon.png"
+          alt="Krishna"
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 space-y-3">
