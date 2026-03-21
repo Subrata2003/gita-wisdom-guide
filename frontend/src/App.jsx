@@ -28,7 +28,7 @@ function WelcomeScreen({ onQuery }) {
           alt="Om symbol"
           width={192}
           height={192}
-          style={{ mixBlendMode: 'screen', filter: 'brightness(0.9) contrast(1.1)' }}
+          style={{ mixBlendMode: 'screen', filter: 'brightness(1.4) contrast(1.05) saturate(1.15)' }}
           className="w-full h-full object-contain"
         />
       </div>
@@ -181,9 +181,9 @@ export default function App() {
           onNewChat={handleClear}
         />
 
-        {/* Scrollable messages area */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+        {/* Scrollable messages area — input is sticky inside this, flows with content */}
+        <main className="flex-1 overflow-y-auto flex flex-col">
+          <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 space-y-5">
             {messages.length === 0 && !isLoading && (
               <WelcomeScreen onQuery={handleQuery} />
             )}
@@ -203,17 +203,17 @@ export default function App() {
 
             <div ref={bottomRef} />
           </div>
-        </main>
 
-        {/* Input bar — solid background, no blur so bg image doesn't show through */}
-        <div className="flex-shrink-0 border-t border-midnight-300 bg-midnight">
-          <div className="max-w-3xl mx-auto px-4 py-4">
-            <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
-            <p className="text-center text-[10px] text-text-muted mt-2">
-              Shift+Enter for new line · guidance is spiritual, not medical advice
-            </p>
+          {/* Input — sticky to the bottom of the scroll container, not viewport-locked */}
+          <div className="sticky bottom-0 bg-midnight border-t border-midnight-300">
+            <div className="max-w-3xl mx-auto px-4 py-4">
+              <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
+              <p className="text-center text-[10px] text-text-muted mt-2">
+                Shift+Enter for new line · guidance is spiritual, not medical advice
+              </p>
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   )
