@@ -138,7 +138,6 @@ export default function App() {
         onSampleQuery={(q) => { setSidebarOpen(false); handleQuery(q) }}
         apiStatus={apiStatus}
         messageCount={messages.length}
-        onClearChat={handleClear}
       />
 
       {/* Main layout — full viewport height */}
@@ -146,6 +145,8 @@ export default function App() {
         <Header
           onMenuClick={() => setSidebarOpen((o) => !o)}
           apiStatus={apiStatus}
+          messages={messages}
+          onNewChat={handleClear}
         />
 
         {/* Scrollable messages area */}

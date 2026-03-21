@@ -1,4 +1,4 @@
-import { X, BookOpen, Sparkles, Trash2, ChevronRight } from 'lucide-react'
+import { X, BookOpen, Sparkles, ChevronRight } from 'lucide-react'
 
 const SAMPLE_QUERIES = [
   "I feel lost and don't know my life's purpose",
@@ -30,7 +30,6 @@ export default function Sidebar({
   onSampleQuery,
   apiStatus,
   messageCount,
-  onClearChat,
 }) {
   return (
     <>
@@ -80,19 +79,6 @@ export default function Sidebar({
                 )}
               </div>
             </div>
-          )}
-
-          {/* Clear session */}
-          {messageCount > 0 && (
-            <button
-              onClick={() => { onClearChat(); onClose() }}
-              className="w-full flex items-center gap-2 p-3 rounded-xl text-xs font-medium
-                         border border-red-500/20 bg-red-900/10 text-red-400
-                         hover:bg-red-900/20 transition-colors"
-            >
-              <Trash2 size={14} />
-              Clear conversation
-            </button>
           )}
 
           {/* Explore themes */}

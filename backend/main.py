@@ -52,7 +52,13 @@ async def lifespan(app: FastAPI):
 
     info = app.state.vector_store.get_collection_info()
     print(f"Vector store   : {info.get('document_count', 0)} documents indexed")
-    print(f"LLM ready      : {app.state.llm_handler.model is not None}")
+    llm = app.state.llm_handler
+    _providers = []
+    if llm.gemini_model:
+        _providers.append(f"Gemini ({llm.gemini_model_name})")
+    if llm.groq_client:
+        _providers.append(f"Groq fallback ({llm.groq_model_name})")
+    print(f"LLM ready      : {', '.join(_providers) or 'NONE — check API keys'}")
     print("API is ready!  Docs -> http://localhost:8000/docs")
     print("=" * 55)
 

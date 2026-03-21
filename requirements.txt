@@ -9,6 +9,7 @@ sentence-transformers
 
 # LLM and API
 google-generativeai
+groq
 
 # Web frameworks
 fastapi>=0.104.0
