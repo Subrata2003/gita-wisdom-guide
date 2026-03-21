@@ -1,13 +1,11 @@
 # Core dependencies
 pandas
 numpy
-scikit-learn
 
-# Vector database and embeddings
+# Vector database
 chromadb
-sentence-transformers
 
-# LLM and API
+# LLM and embedding APIs (no local ML model needed)
 google-generativeai
 groq
 
