@@ -5,18 +5,25 @@ export default function VerseCard({ verse }) {
     <div
       className="verse-card relative rounded-2xl overflow-hidden p-4"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,140,0,0.06) 0%, rgba(26,22,64,0.95) 50%)',
-        border: '1px solid rgba(255,140,0,0.18)',
-        boxShadow: '0 2px 16px rgba(0,0,0,0.3)',
+        backgroundImage: 'url(/images/verse-scroll.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        border: '1px solid rgba(255,140,0,0.3)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Thin gradient left accent */}
+      {/* Dark overlay so text stays readable over the parchment */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl"
+        className="absolute inset-0 rounded-2xl"
+        style={{ background: 'rgba(0,0,0,0.52)' }}
+      />
+      {/* Thin gradient left accent — sits above overlay */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl z-10"
         style={{ background: 'linear-gradient(to bottom, #FF8C00, #FFD700)' }}
       />
 
-      <div className="pl-2">
+      <div className="pl-2 relative z-10">
         <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 flex-wrap">
             <span
@@ -45,7 +52,7 @@ export default function VerseCard({ verse }) {
           )}
         </div>
 
-        <p className="text-cream-dark text-[13px] leading-relaxed italic">{verse.text}</p>
+        <p className="text-cream text-[13px] leading-relaxed italic" style={{ color: '#F5E6C8', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{verse.text}</p>
       </div>
     </div>
   )

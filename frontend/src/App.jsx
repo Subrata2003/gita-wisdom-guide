@@ -18,7 +18,17 @@ const WELCOME_QUERIES = [
 function WelcomeScreen({ onQuery }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="text-6xl mb-5 animate-float select-none">🕉️</div>
+      {/* Hero Om image — mix-blend-mode:multiply makes the cream bg invisible on dark navy */}
+      <div className="animate-float mb-3 select-none" style={{ width: 192, height: 192 }}>
+        <img
+          src="/images/hero-om.png"
+          alt="Om symbol"
+          width={192}
+          height={192}
+          style={{ mixBlendMode: 'multiply', filter: 'brightness(1.1) saturate(1.2)' }}
+          className="w-full h-full object-contain"
+        />
+      </div>
 
       <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-saffron via-gold to-saffron bg-clip-text text-transparent">
         Seek Wisdom
@@ -130,6 +140,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-midnight flex flex-col relative overflow-hidden">
+      {/* Full-page atmospheric background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/images/bg-temple.png"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover"
+          style={{ opacity: 0.20 }}
+        />
+        {/* Dark overlay to keep UI readable */}
+        <div className="absolute inset-0" style={{ background: 'rgba(10, 13, 46, 0.72)' }} />
+      </div>
       <MandalaBackground />
 
       <Sidebar

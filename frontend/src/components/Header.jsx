@@ -34,7 +34,11 @@ export default function Header({ onMenuClick, apiStatus, messages = [], onNewCha
           </button>
 
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl leading-none select-none">🕉️</span>
+            <img
+              src="/images/app-icon.png"
+              alt="Gita Wisdom Guide"
+              className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
+            />
             <div>
               <h1 className="text-base font-bold leading-tight bg-gradient-to-r from-saffron to-gold bg-clip-text text-transparent">
                 Gita Wisdom Guide
