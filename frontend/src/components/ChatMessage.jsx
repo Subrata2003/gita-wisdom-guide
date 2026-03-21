@@ -44,21 +44,36 @@ export default function ChatMessage({ message }) {
       <div className="flex-1 min-w-0 space-y-3">
         {/* Response bubble */}
         <div
-          className={`card px-5 py-5 rounded-2xl rounded-tl-none ${
-            message.error ? 'border-red-500/30 bg-red-900/10' : ''
+          className={`relative rounded-2xl rounded-tl-none overflow-hidden ${
+            message.error ? 'border border-red-500/30 bg-red-900/10' : ''
           }`}
+          style={message.error ? {} : {
+            background: 'linear-gradient(135deg, #1A1640 0%, #1e1a4a 100%)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,140,0,0.08)',
+            border: '1px solid rgba(45,40,104,0.8)',
+          }}
         >
-          {message.error && (
-            <p className="text-red-400 text-xs font-medium mb-2">
-              ⚠ Partial response — LLM encountered an issue
-            </p>
+          {/* Saffron accent line at top */}
+          {!message.error && (
+            <div
+              className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+              style={{ background: 'linear-gradient(90deg, #FF8C00, #FFD700, transparent)' }}
+            />
           )}
-          <div className="wisdom-prose">
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+
+          <div className="px-5 py-5">
+            {message.error && (
+              <p className="text-red-400 text-xs font-medium mb-2">
+                ⚠ Partial response — LLM encountered an issue
+              </p>
+            )}
+            <div className="wisdom-prose">
+              <ReactMarkdown>{message.content}</ReactMarkdown>
+            </div>
+            <p className="text-[10px] text-text-muted mt-3">
+              {formatTime(message.timestamp)}
+            </p>
           </div>
-          <p className="text-[10px] text-text-muted mt-3">
-            {formatTime(message.timestamp)}
-          </p>
         </div>
 
         {/* Theme badges */}

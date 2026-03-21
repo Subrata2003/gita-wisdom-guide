@@ -82,33 +82,113 @@
   30% { opacity: 1; transform: scale(1); }
 }
 
-/* Prose overrides for markdown responses */
+/* ── Prose overrides for markdown responses ──────────────────────────────── */
 .wisdom-prose p {
-  @apply text-cream leading-relaxed mb-3;
+  @apply text-cream leading-relaxed mb-3 text-[15px];
 }
+
+/* Glowing gold bold — highlights key spiritual terms */
 .wisdom-prose strong {
-  @apply text-gold font-semibold;
+  @apply font-bold;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.35);
 }
+
+/* Saffron italic — used for asides and poetry */
 .wisdom-prose em {
-  @apply text-saffron-light not-italic;
+  @apply text-saffron-light italic;
 }
-.wisdom-prose h1, .wisdom-prose h2, .wisdom-prose h3 {
-  @apply text-gold font-bold mb-2 mt-4;
+
+/* Headers — gradient saffron→gold (if LLM uses them) */
+.wisdom-prose h1,
+.wisdom-prose h2,
+.wisdom-prose h3 {
+  background: linear-gradient(90deg, #FF8C00, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  @apply font-bold mb-2 mt-5 text-base;
 }
-.wisdom-prose ul, .wisdom-prose ol {
-  @apply ml-4 mb-3 space-y-1;
+
+/* Ordered list — gold circle numbers for actionable steps */
+.wisdom-prose ol {
+  @apply mb-4 space-y-3;
+  list-style: none;
+  counter-reset: wisdom-counter;
+  padding-left: 0;
 }
-.wisdom-prose li {
-  @apply text-cream;
+.wisdom-prose ol li {
+  @apply relative text-cream leading-relaxed;
+  counter-increment: wisdom-counter;
+  padding-left: 2.4rem;
 }
-.wisdom-prose hr {
-  @apply border-midnight-300 my-4;
+.wisdom-prose ol li::before {
+  content: counter(wisdom-counter);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #FF8C00, #FFD700);
+  color: #0D0B1E;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* Unordered list — saffron diamond bullets */
+.wisdom-prose ul {
+  @apply mb-4 space-y-2;
+  list-style: none;
+  padding-left: 0;
+}
+.wisdom-prose ul li {
+  @apply relative text-cream leading-relaxed;
+  padding-left: 1.6rem;
+}
+.wisdom-prose ul li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  color: #FF8C00;
+  font-size: 0.6rem;
+  line-height: 1.6rem;
+}
+
+/* Blockquote — verse citations with gradient left bar */
 .wisdom-prose blockquote {
-  @apply border-l-2 border-saffron pl-4 italic text-cream-dark my-3;
+  position: relative;
+  @apply rounded-r-xl px-5 py-3 my-4 italic text-cream-dark text-[14px] leading-relaxed;
+  background: rgba(255, 140, 0, 0.07);
+  border-left: 3px solid transparent;
+  background-clip: padding-box;
 }
+.wisdom-prose blockquote::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, #FF8C00, #FFD700);
+}
+
+/* HR — thin gradient divider */
+.wisdom-prose hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 140, 0, 0.35), transparent);
+  @apply my-4;
+}
+
+/* Inline code */
 .wisdom-prose code {
-  @apply text-gold bg-midnight-200 px-1 rounded text-sm;
+  @apply text-gold bg-midnight-200 px-1.5 py-0.5 rounded text-sm;
 }
 
 /* Verse card hover */
