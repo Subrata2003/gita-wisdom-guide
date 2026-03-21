@@ -63,9 +63,16 @@ function WelcomeScreen({ onQuery }) {
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-3 msg-enter">
-      <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-base
-                      bg-gradient-to-br from-saffron to-gold shadow-saffron">
-        🕉️
+      <div
+        className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden shadow-saffron"
+        style={{ background: '#0D0B1E' }}
+      >
+        <img
+          src="/images/app-icon.png"
+          alt="Krishna"
+          className="w-full h-full object-cover"
+          style={{ transform: 'scale(1.08)' }}
+        />
       </div>
       <div className="card rounded-2xl rounded-tl-none px-5 py-4">
         <div className="flex items-center gap-2">
@@ -198,8 +205,8 @@ export default function App() {
           </div>
         </main>
 
-        {/* Fixed input bar */}
-        <div className="flex-shrink-0 border-t border-midnight-300 bg-midnight/90 backdrop-blur-xl">
+        {/* Input bar — solid background, no blur so bg image doesn't show through */}
+        <div className="flex-shrink-0 border-t border-midnight-300 bg-midnight">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
             <p className="text-center text-[10px] text-text-muted mt-2">
