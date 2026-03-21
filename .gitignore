@@ -25,8 +25,7 @@ ENV/
 .venv/
 geeta_env/
 
-# ── Vector database — committed so deployment works without re-indexing ──────
-# Un-comment the line below only if you want to exclude it and re-run setup.py
+# ── Vector database (binary, rebuilt from data/) ─────────────
 vector_db/
 
 # ── Frontend build output ─────────────────────────────────────

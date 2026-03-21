@@ -29,16 +29,11 @@ def check_env():
 
     api_key = os.getenv("GOOGLE_API_KEY", "")
     if not api_key or api_key == "your_google_api_key_here":
-        print("  ERROR: GOOGLE_API_KEY is not set in .env")
-        print("  Gemini embeddings require this key. Get one at https://aistudio.google.com/")
-        sys.exit(1)
+        print("  WARNING: GOOGLE_API_KEY is not set in .env")
+        print("  Get a free key at https://aistudio.google.com/")
+        print("  The vector store will still be built; only LLM responses will fail.")
     else:
-        print(f"  GOOGLE_API_KEY    : set ({api_key[:8]}...)")
-
-    import google.generativeai as genai
-    genai.configure(api_key=api_key)
-    print(f"  Embedding model   : {os.getenv('EMBEDDING_MODEL', 'models/gemini-embedding-001')}")
-    print(f"  LLM model         : {os.getenv('DEFAULT_LLM', 'gemini-3.1-flash-lite-preview')}")
+        print(f"  GOOGLE_API_KEY: set ({api_key[:8]}...)")
 
 
 def process_data():
@@ -65,9 +60,8 @@ def process_data():
     print(f"  Chapters         : {stats['total_chapters']}")
 
 
-def build_vector_store(force: bool = False):
+def build_vector_store():
     step("Building vector database")
-    import shutil
     from vector_store import GitaVectorStore
     from backend.config import settings
 
@@ -76,24 +70,18 @@ def build_vector_store(force: bool = False):
         print("  ERROR: processed_gita_data.json not found. Run process_data() first.")
         sys.exit(1)
 
-    # Force-delete existing DB when --rebuild is passed
-    if force and Path(settings.VECTOR_DB_PATH).exists():
-        shutil.rmtree(settings.VECTOR_DB_PATH)
-        print(f"  Removed old vector_db at {settings.VECTOR_DB_PATH}")
-
     vs = GitaVectorStore(
         collection_name=settings.COLLECTION_NAME,
         persist_directory=settings.VECTOR_DB_PATH,
     )
     existing = vs.get_collection_info().get("document_count", 0)
 
-    if existing > 0 and not force:
-        print(f"  Vector store already has {existing} documents — skipping.")
-        print("  Run  python setup.py --rebuild  to force a full re-index.")
+    if existing > 0:
+        print(f"  Vector store already has {existing} documents — skipping re-indexing.")
+        print("  (To force rebuild: delete the vector_db/ folder and re-run setup.py)")
         return
 
     print(f"  Indexing {processed_path} into ChromaDB...")
-    print("  Using Gemini Embedding API — this takes ~8-10 min for 854 docs.")
     vs.load_and_index_data(str(processed_path))
     final_count = vs.get_collection_info().get("document_count", 0)
     print(f"  Indexed {final_count} documents into {settings.VECTOR_DB_PATH}")
@@ -125,15 +113,13 @@ def verify():
 
 
 if __name__ == "__main__":
-    rebuild = "--rebuild" in sys.argv
-
     print("=" * 55)
-    print("  Gita Wisdom Guide — Setup" + (" (REBUILD)" if rebuild else ""))
+    print("  Gita Wisdom Guide — Setup")
     print("=" * 55)
 
     check_env()
     process_data()
-    build_vector_store(force=rebuild)
+    build_vector_store()
     verify()
 
     print("\n" + "=" * 55)
