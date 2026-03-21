@@ -18,14 +18,17 @@ const WELCOME_QUERIES = [
 function WelcomeScreen({ onQuery }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      {/* Hero Om image — mix-blend-mode:multiply makes the cream bg invisible on dark navy */}
-      <div className="animate-float mb-3 select-none" style={{ width: 192, height: 192 }}>
+      {/* Hero Om image — screen blend mode removes dark background, gold Om glows through */}
+      <div
+        className="animate-float mb-3 select-none"
+        style={{ width: 192, height: 192, background: 'transparent' }}
+      >
         <img
           src="/images/hero-om-V2.jpeg"
           alt="Om symbol"
           width={192}
           height={192}
-          style={{ mixBlendMode: 'multiply', filter: 'brightness(1.1) saturate(1.2)' }}
+          style={{ mixBlendMode: 'screen', filter: 'brightness(0.9) contrast(1.1)' }}
           className="w-full h-full object-contain"
         />
       </div>
