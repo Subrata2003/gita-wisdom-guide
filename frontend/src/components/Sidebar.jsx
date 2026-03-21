@@ -52,17 +52,11 @@ export default function Sidebar({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div
-                className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0"
-                style={{ background: '#0D0B1E' }}
-              >
-                <img
-                  src="/images/app-icon.png"
-                  alt="Gita Wisdom"
-                  className="w-full h-full object-cover"
-                  style={{ transform: 'scale(1.08)' }}
-                />
-              </div>
+              <img
+                src="/images/app-icon.png"
+                alt="Gita Wisdom"
+                className="w-7 h-7 object-contain flex-shrink-0"
+              />
               <span className="font-bold text-gold">Sacred Guide</span>
             </div>
             <button

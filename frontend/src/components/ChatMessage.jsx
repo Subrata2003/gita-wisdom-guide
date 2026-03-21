@@ -33,16 +33,12 @@ export default function ChatMessage({ message }) {
   // Assistant message
   return (
     <div className="flex items-start gap-3 msg-enter">
-      {/* Avatar — dark navy bg prevents white corners showing through the circle crop */}
-      <div
-        className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden shadow-saffron"
-        style={{ background: '#0D0B1E' }}
-      >
+      {/* Avatar — transparent PNG, no background needed */}
+      <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
         <img
-          src="/images/app-icon.png"
+          src="/images/chat_app_logo.png"
           alt="Krishna"
-          className="w-full h-full object-cover"
-          style={{ transform: 'scale(1.08)' }}
+          className="w-full h-full object-contain"
         />
       </div>
 

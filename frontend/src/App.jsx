@@ -24,11 +24,10 @@ function WelcomeScreen({ onQuery }) {
         style={{ width: 192, height: 192, background: 'transparent' }}
       >
         <img
-          src="/images/hero-om-V2.jpeg"
+          src="/images/hero-om-V2.png"
           alt="Om symbol"
           width={192}
           height={192}
-          style={{ mixBlendMode: 'screen', filter: 'brightness(1.4) contrast(1.05) saturate(1.15)' }}
           className="w-full h-full object-contain"
         />
       </div>
@@ -63,15 +62,11 @@ function WelcomeScreen({ onQuery }) {
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-3 msg-enter">
-      <div
-        className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden shadow-saffron"
-        style={{ background: '#0D0B1E' }}
-      >
+      <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
         <img
-          src="/images/app-icon.png"
+          src="/images/chat_app_logo.png"
           alt="Krishna"
-          className="w-full h-full object-cover"
-          style={{ transform: 'scale(1.08)' }}
+          className="w-full h-full object-contain"
         />
       </div>
       <div className="card rounded-2xl rounded-tl-none px-5 py-4">

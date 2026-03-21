@@ -37,7 +37,7 @@ export default function Header({ onMenuClick, apiStatus, messages = [], onNewCha
             <img
               src="/images/app-icon.png"
               alt="Gita Wisdom Guide"
-              className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
+              className="w-9 h-9 object-contain flex-shrink-0"
             />
             <div>
               <h1 className="text-base font-bold leading-tight bg-gradient-to-r from-saffron to-gold bg-clip-text text-transparent">
