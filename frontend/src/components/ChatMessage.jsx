@@ -68,17 +68,45 @@ export default function ChatMessage({ message }) {
                 ⚠ Partial response — LLM encountered an issue
               </p>
             )}
-            <div className="wisdom-prose">
-              <ReactMarkdown>{message.content}</ReactMarkdown>
-            </div>
-            <p className="text-[10px] text-text-muted mt-3">
-              {formatTime(message.timestamp)}
-            </p>
+
+            {/* Waiting for first token: show typing dots */}
+            {message.streaming && message.content === '' ? (
+              <div className="flex items-center gap-2 py-1">
+                <span className="text-xs text-text-muted">Reflecting on wisdom</span>
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-saffron dot-1" />
+                  <div className="w-2 h-2 rounded-full bg-saffron dot-2" />
+                  <div className="w-2 h-2 rounded-full bg-saffron dot-3" />
+                </div>
+              </div>
+            ) : message.streaming ? (
+              /* Streaming: plain text + blinking cursor */
+              <div className="wisdom-prose">
+                <span className="whitespace-pre-wrap text-sm leading-relaxed text-cream">
+                  {message.content}
+                </span>
+                <span
+                  className="inline-block w-[2px] h-[1.1em] bg-gold ml-[2px] align-middle"
+                  style={{ animation: 'pulse 1s ease-in-out infinite' }}
+                />
+              </div>
+            ) : (
+              /* Done: full markdown rendering */
+              <div className="wisdom-prose">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+            )}
+
+            {!message.streaming && (
+              <p className="text-[10px] text-text-muted mt-3">
+                {formatTime(message.timestamp)}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Theme badges */}
-        {message.themes?.length > 0 && (
+        {/* Theme badges and verse accordion appear only after streaming is done */}
+        {message.themes?.length > 0 && !message.streaming && (
           <div className="flex flex-wrap gap-1.5">
             {message.themes.map((t) => (
               <ThemeBadge key={t} theme={t} />
@@ -87,7 +115,7 @@ export default function ChatMessage({ message }) {
         )}
 
         {/* Verse accordion */}
-        {message.verses?.length > 0 && (
+        {message.verses?.length > 0 && !message.streaming && (
           <div>
             <button
               onClick={() => setVersesOpen((v) => !v)}

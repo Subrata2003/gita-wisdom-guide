@@ -14,6 +14,8 @@ class VerseInfo(BaseModel):
     theme: str
     verse_id: str
     relevance_score: float
+    sanskrit: Optional[str] = None
+    transliteration: Optional[str] = None
 
 
 class WisdomResponse(BaseModel):

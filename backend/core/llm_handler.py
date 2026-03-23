@@ -197,6 +197,76 @@ class EnhancedGitaLLMHandler:
         )
         return completion.choices[0].message.content
 
+    # ─── Streaming generators ─────────────────────────────────────────────────
+
+    def _stream_gemini(self, system: str, user_content: str):
+        """Sync generator — yields text chunks from Gemini streaming API."""
+        full_prompt = f"{system}\n\n{user_content}"
+        response = self.gemini_model.generate_content(full_prompt, stream=True)
+        for chunk in response:
+            if hasattr(chunk, "text") and chunk.text:
+                yield chunk.text
+
+    def _stream_groq(self, system: str, user_content: str):
+        """Sync generator — yields text chunks from Groq streaming API."""
+        stream = self.groq_client.chat.completions.create(
+            model=self.groq_model_name,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": user_content},
+            ],
+            max_tokens=1024,
+            temperature=0.7,
+            stream=True,
+        )
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+
+    def _stream_with_fallback(self, system: str, user_content: str):
+        """
+        Sync generator — tries Gemini first, falls back to Groq on rate-limit.
+        If Gemini fails before the first token, Groq takes over seamlessly.
+        If Gemini fails mid-stream, yields an interruption note.
+        """
+        first_yielded = False
+
+        if self.gemini_model:
+            try:
+                for chunk in self._stream_gemini(system, user_content):
+                    first_yielded = True
+                    yield chunk
+                return
+            except Exception as e:
+                if _is_rate_limit(e) and not first_yielded and self.groq_client:
+                    print(f"Gemini rate-limit on stream — switching to Groq. ({type(e).__name__})")
+                    # fall through to Groq below
+                elif first_yielded:
+                    yield "\n\n*(Response was interrupted — please try again.)*"
+                    return
+                else:
+                    raise
+
+        if self.groq_client:
+            yield from self._stream_groq(system, user_content)
+            return
+
+        raise RuntimeError(
+            "All LLM providers unavailable. Check GOOGLE_API_KEY / GROQ_API_KEY in .env."
+        )
+
+    def stream_response(self, user_query: str, context: Dict):
+        """Public streaming generator for SPIRITUAL queries (with RAG context)."""
+        system, user_content = self._build_spiritual_parts(user_query, context)
+        yield from self._stream_with_fallback(system, user_content)
+
+    def stream_typed_response(self, user_query: str, query_type: QueryType):
+        """Public streaming generator for GREETING / FACTUAL queries."""
+        system = GREETING_SYSTEM if query_type == QueryType.GREETING else FACTUAL_SYSTEM
+        user_content = f'The seeker asks: "{user_query}"'
+        yield from self._stream_with_fallback(system, user_content)
+
     # ─── Prompt builders ──────────────────────────────────────────────────────
 
     def _build_spiritual_parts(self, user_query: str, context: Dict) -> Tuple[str, str]:

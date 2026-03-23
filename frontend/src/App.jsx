@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar.jsx'
 import ChatMessage from './components/ChatMessage.jsx'
 import QueryInput from './components/QueryInput.jsx'
 import MandalaBackground from './components/MandalaBackground.jsx'
-import { getWisdom, getHealth } from './services/api.js'
+import { streamWisdom, getHealth } from './services/api.js'
 
 const WELCOME_QUERIES = [
   "I feel lost and don't know my purpose",
@@ -105,34 +105,62 @@ export default function App() {
   }, [messages, isLoading])
 
   const handleQuery = useCallback(
-    async (query) => {
+    (query) => {
       if (!query.trim() || isLoading) return
 
       const userMsg = { role: 'user', content: query, timestamp: new Date() }
-      setMessages((prev) => [...prev, userMsg])
+
+      // Placeholder streaming message — content fills in token by token
+      const streamingMsg = {
+        role: 'assistant',
+        content: '',
+        streaming: true,
+        verses: [],
+        themes: [],
+        timestamp: new Date(),
+        error: false,
+      }
+
+      setMessages((prev) => [...prev, userMsg, streamingMsg])
       setIsLoading(true)
       setError(null)
 
-      try {
-        const data = await getWisdom(query, sessionId)
-        setSessionId(data.session_id)
+      streamWisdom(query, sessionId, {
+        onToken: (token) => {
+          setMessages((prev) => {
+            const msgs = [...prev]
+            const last = msgs[msgs.length - 1]
+            if (last?.streaming) {
+              msgs[msgs.length - 1] = { ...last, content: last.content + token }
+            }
+            return msgs
+          })
+        },
 
-        const assistantMsg = {
-          role: 'assistant',
-          content: data.response,
-          verses: data.used_verses || [],
-          themes: data.themes || [],
-          timestamp: new Date(),
-          error: data.error,
-        }
-        setMessages((prev) => [...prev, assistantMsg])
-      } catch (err) {
-        setError(err.message || 'Failed to reach the wisdom service. Is the backend running?')
-        // Remove the user message that errored out so they can retry
-        setMessages((prev) => prev.slice(0, -1))
-      } finally {
-        setIsLoading(false)
-      }
+        onDone: (event) => {
+          setSessionId(event.session_id)
+          setMessages((prev) => {
+            const msgs = [...prev]
+            const last = msgs[msgs.length - 1]
+            if (last?.streaming) {
+              msgs[msgs.length - 1] = {
+                ...last,
+                streaming: false,
+                verses: event.verses  || [],
+                themes: event.themes  || [],
+              }
+            }
+            return msgs
+          })
+          setIsLoading(false)
+        },
+
+        onError: (err) => {
+          setError(err.message || 'Failed to reach the wisdom service. Is the backend running?')
+          setMessages((prev) => prev.filter((m) => !m.streaming).slice(0, -1))
+          setIsLoading(false)
+        },
+      })
     },
     [isLoading, sessionId]
   )
@@ -186,8 +214,6 @@ export default function App() {
             {messages.map((msg, idx) => (
               <ChatMessage key={idx} message={msg} />
             ))}
-
-            {isLoading && <TypingIndicator />}
 
             {error && (
               <div className="card border-red-500/30 bg-red-900/10 p-4 text-red-300 text-sm flex items-start gap-2">

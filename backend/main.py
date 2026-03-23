@@ -4,6 +4,7 @@ Run with: uvicorn backend.main:app --reload --port 8000
 (from the project root: gita-wisdom-guide/)
 """
 
+import json
 import sys
 import traceback
 from contextlib import asynccontextmanager
@@ -49,6 +50,16 @@ async def lifespan(app: FastAPI):
 
     print("Initializing LLM handler...")
     app.state.llm_handler = EnhancedGitaLLMHandler()
+
+    # Sanskrit lookup — loaded once, served from memory (tiny ~500 KB)
+    sanskrit_path = ROOT_DIR / "data" / "sanskrit_lookup.json"
+    if sanskrit_path.exists():
+        with open(sanskrit_path, encoding="utf-8") as _f:
+            app.state.sanskrit = json.load(_f)
+        print(f"Sanskrit index : {len(app.state.sanskrit)} verses loaded")
+    else:
+        app.state.sanskrit = {}
+        print("Sanskrit index : not found — run  python data/fetch_sanskrit.py  once")
 
     info = app.state.vector_store.get_collection_info()
     print(f"Vector store   : {info.get('document_count', 0)} documents indexed")
