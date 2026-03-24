@@ -5,6 +5,7 @@ import ChatMessage from './components/ChatMessage.jsx'
 import QueryInput from './components/QueryInput.jsx'
 import MandalaBackground from './components/MandalaBackground.jsx'
 import { streamWisdom, getHealth } from './services/api.js'
+import DailyVerse from './components/DailyVerse.jsx'
 
 const WELCOME_QUERIES = [
   "I feel lost and don't know my purpose",
@@ -17,7 +18,7 @@ const WELCOME_QUERIES = [
 
 function WelcomeScreen({ onQuery }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
       {/* Hero Om image — screen blend mode removes dark background, gold Om glows through */}
       <div
         className="animate-float mb-3 select-none"
@@ -41,6 +42,9 @@ function WelcomeScreen({ onQuery }) {
       <p className="text-text-muted text-xs mb-10">
         Type below or choose a question to begin
       </p>
+
+      {/* Daily Verse */}
+      <DailyVerse onQuery={onQuery} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl w-full">
         {WELCOME_QUERIES.map((q, i) => (

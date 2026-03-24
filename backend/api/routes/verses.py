@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, Query, HTTPException, Request
 from typing import Optional
 
@@ -100,3 +102,36 @@ async def search_verses(
             )
 
     return {"verses": verses, "total": len(verses)}
+
+
+@router.get("/verse/daily")
+async def get_daily_verse(request: Request):
+    """
+    Returns today's verse — deterministic, changes daily.
+    Same verse for every user on the same calendar day.
+    """
+    all_verses    = getattr(request.app.state, "all_verses",  [])
+    sanskrit_index = getattr(request.app.state, "sanskrit",   {})
+
+    if not all_verses:
+        raise HTTPException(status_code=503, detail="Verse pool not loaded yet")
+
+    # Day-of-year (1-365/366) drives the rotation — same verse all day, every day
+    day_of_year = datetime.date.today().timetuple().tm_yday
+    verse       = all_verses[(day_of_year - 1) % len(all_verses)]
+
+    ch  = verse.get("chapter", 0)
+    vs  = verse.get("verse",   0)
+    key = f"{ch}_{vs}"
+    sk  = sanskrit_index.get(key, {})
+
+    return {
+        "chapter":         ch,
+        "verse":           vs,
+        "verse_id":        verse.get("verse_id", ""),
+        "text":            verse.get("text", ""),
+        "theme":           verse.get("theme", "general"),
+        "sanskrit":        sk.get("sanskrit"),
+        "transliteration": sk.get("transliteration"),
+        "date":            str(datetime.date.today()),
+    }

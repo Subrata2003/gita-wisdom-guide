@@ -61,6 +61,20 @@ async def lifespan(app: FastAPI):
         app.state.sanskrit = {}
         print("Sanskrit index : not found — run  python data/fetch_sanskrit.py  once")
 
+    # All individual verses — used for Daily Verse feature
+    gita_data_path = ROOT_DIR / "data" / "processed_gita_data.json"
+    if gita_data_path.exists():
+        with open(gita_data_path, encoding="utf-8") as _f:
+            _all_docs = json.load(_f)
+        app.state.all_verses = [
+            d for d in _all_docs
+            if d.get("content_type") == "verse"
+            and d.get("chapter") and d.get("verse")
+        ]
+        print(f"Verse pool     : {len(app.state.all_verses)} verses for daily feature")
+    else:
+        app.state.all_verses = []
+
     info = app.state.vector_store.get_collection_info()
     print(f"Vector store   : {info.get('document_count', 0)} documents indexed")
     llm = app.state.llm_handler

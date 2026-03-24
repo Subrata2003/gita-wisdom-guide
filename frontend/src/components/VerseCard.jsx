@@ -1,8 +1,16 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Share2 } from 'lucide-react'
+import { shareVerseCard } from '../utils/shareCard.js'
 
 export default function VerseCard({ verse }) {
   const [showTranslit, setShowTranslit] = useState(false)
+  const [sharing, setSharing] = useState(false)
+
+  async function handleShare() {
+    setSharing(true)
+    try { await shareVerseCard(verse) } catch { /* ignore */ }
+    setSharing(false)
+  }
   const pct = Math.min(100, Math.round((verse.relevance_score || 0) * 100))
   const hasSanskrit = !!verse.sanskrit
 
@@ -40,17 +48,31 @@ export default function VerseCard({ verse }) {
               <span className="text-[11px] capitalize font-medium" style={{ color: '#E8C97A' }}>{verse.theme}</span>
             )}
           </div>
-          {pct > 0 && (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <div className="w-14 h-1 bg-midnight-300 rounded-full overflow-hidden">
-                <div
-                  className="relevance-bar h-full bg-gradient-to-r from-saffron to-gold rounded-full"
-                  style={{ width: `${pct}%` }}
-                />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {pct > 0 && (
+              <div className="flex items-center gap-1.5">
+                <div className="w-14 h-1 bg-midnight-300 rounded-full overflow-hidden">
+                  <div
+                    className="relevance-bar h-full bg-gradient-to-r from-saffron to-gold rounded-full"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-semibold" style={{ color: '#E8C97A' }}>{pct}%</span>
               </div>
-              <span className="text-[10px] font-semibold" style={{ color: '#E8C97A' }}>{pct}%</span>
-            </div>
-          )}
+            )}
+            {/* Share button */}
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              title="Share this verse"
+              className="transition-colors disabled:opacity-40"
+              style={{ color: sharing ? '#FFD700' : '#7B6FA0' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#FFD700'}
+              onMouseLeave={e => { if (!sharing) e.currentTarget.style.color = '#7B6FA0' }}
+            >
+              <Share2 size={13} />
+            </button>
+          </div>
         </div>
 
         {/* Sanskrit shloka in Devanagari */}

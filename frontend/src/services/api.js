@@ -32,6 +32,11 @@ export const getHealth = async () => {
   return data
 }
 
+export const getDailyVerse = async () => {
+  const { data } = await api.get('/verse/daily')
+  return data
+}
+
 export const getThemes = async () => {
   const { data } = await api.get('/themes')
   return data
