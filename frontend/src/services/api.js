@@ -66,10 +66,17 @@ export const clearSession = async (sessionId) => {
  *
  * Returns { abort } — call abort() to cancel mid-stream.
  */
+// In development, Vite's proxy buffers SSE responses (waits for stream to close
+// before forwarding anything). We bypass it by calling the backend directly.
+// CORS on the backend already allows http://localhost:5173.
+const STREAM_URL = import.meta.env.DEV
+  ? 'http://127.0.0.1:8000/api/query/stream'
+  : '/api/query/stream'
+
 export function streamWisdom(query, sessionId, { onToken, onDone, onError }) {
   const controller = new AbortController()
 
-  fetch('/api/query/stream', {
+  fetch(STREAM_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, session_id: sessionId || undefined }),
