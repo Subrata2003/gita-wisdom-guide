@@ -32,9 +32,10 @@ load_dotenv(_ROOT / ".env")
 
 # Rate-limit signal phrases — same across all providers
 _RATE_LIMIT_SIGNALS = (
-    "429", "rate limit", "quota exceeded", "resource exhausted",
+    "429", "503", "504", "rate limit", "quota exceeded", "resource exhausted",
     "too many requests", "ratelimitexceeded", "rate_limit_exceeded",
-    "tokens per", "requests per",
+    "tokens per", "requests per", "high demand", "service unavailable",
+    "temporarily unavailable", "try again later", "deadline exceeded",
 )
 
 
@@ -64,8 +65,9 @@ class EnhancedGitaLLMHandler:
             self._google_key = os.getenv("GOOGLE_API_KEY", "")
             self._groq_key = os.getenv("GROQ_API_KEY", "")
 
-        self.gemini_model = None
-        self.groq_client = None
+        self.gemini_model      = None
+        self.groq_client       = None
+        self.groq_client_async = None
         self._init_gemini()
         self._init_groq()
 
@@ -88,8 +90,9 @@ class EnhancedGitaLLMHandler:
             print("INFO: GROQ_API_KEY not set — Groq fallback disabled.")
             return
         try:
-            from groq import Groq
-            self.groq_client = Groq(api_key=self._groq_key)
+            from groq import Groq, AsyncGroq
+            self.groq_client       = Groq(api_key=self._groq_key)
+            self.groq_client_async = AsyncGroq(api_key=self._groq_key)
             print(f"Groq ready (fallback): {self.groq_model_name}")
         except Exception as e:
             print(f"WARNING: Groq init failed: {e}")
@@ -266,6 +269,70 @@ class EnhancedGitaLLMHandler:
         system = GREETING_SYSTEM if query_type == QueryType.GREETING else FACTUAL_SYSTEM
         user_content = f'The seeker asks: "{user_query}"'
         yield from self._stream_with_fallback(system, user_content)
+
+    # ─── Async streaming (used by FastAPI StreamingResponse) ──────────────────
+    # Gemini gRPC streaming CANNOT run inside anyio's thread pool (DeadlineExceeded).
+    # These async generators run entirely on the event loop — no thread handoff.
+
+    async def _stream_gemini_async(self, system: str, user_content: str):
+        full_prompt = f"{system}\n\n{user_content}"
+        response = await self.gemini_model.generate_content_async(full_prompt, stream=True)
+        async for chunk in response:
+            if hasattr(chunk, "text") and chunk.text:
+                yield chunk.text
+
+    async def _stream_groq_async(self, system: str, user_content: str):
+        stream = await self.groq_client_async.chat.completions.create(
+            model=self.groq_model_name,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": user_content},
+            ],
+            max_tokens=1024,
+            temperature=0.7,
+            stream=True,
+        )
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+
+    async def _stream_with_fallback_async(self, system: str, user_content: str):
+        first_yielded = False
+        if self.gemini_model:
+            try:
+                async for chunk in self._stream_gemini_async(system, user_content):
+                    first_yielded = True
+                    yield chunk
+                return
+            except Exception as e:
+                if _is_rate_limit(e) and not first_yielded and self.groq_client_async:
+                    print(f"Gemini rate-limit on stream — switching to Groq. ({type(e).__name__})")
+                elif first_yielded:
+                    yield "\n\n*(Response was interrupted — please try again.)*"
+                    return
+                else:
+                    raise
+
+        if self.groq_client_async:
+            async for chunk in self._stream_groq_async(system, user_content):
+                yield chunk
+            return
+
+        raise RuntimeError("All LLM providers unavailable. Check API keys in .env.")
+
+    async def stream_response_async(self, user_query: str, context: Dict):
+        """Async streaming for SPIRITUAL queries — safe to use in FastAPI routes."""
+        system, user_content = self._build_spiritual_parts(user_query, context)
+        async for chunk in self._stream_with_fallback_async(system, user_content):
+            yield chunk
+
+    async def stream_typed_response_async(self, user_query: str, query_type: QueryType):
+        """Async streaming for GREETING / FACTUAL queries."""
+        system = GREETING_SYSTEM if query_type == QueryType.GREETING else FACTUAL_SYSTEM
+        user_content = f'The seeker asks: "{user_query}"'
+        async for chunk in self._stream_with_fallback_async(system, user_content):
+            yield chunk
 
     # ─── Prompt builders ──────────────────────────────────────────────────────
 

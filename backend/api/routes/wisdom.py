@@ -147,18 +147,18 @@ async def stream_wisdom(request: Request, body: QueryRequest):
             yield _sse({"type": "done",   "verses": [], "themes": [], "session_id": session_id})
         return StreamingResponse(_off_topic(), media_type="text/event-stream", headers=_SSE_HEADERS)
 
-    # ── GREETING / FACTUAL: stream without RAG ────────────────────────────────
+    # ── GREETING / FACTUAL: async stream without RAG ─────────────────────────
     if query_type in (QueryType.GREETING, QueryType.FACTUAL):
-        def _typed():
+        async def _typed():
             full = ""
-            for chunk in llm_handler.stream_typed_response(body.query, query_type):
+            async for chunk in llm_handler.stream_typed_response_async(body.query, query_type):
                 full += chunk
                 yield _sse({"type": "token", "content": chunk})
             _session_manager.add_to_history(session_id, body.query, full, [], [])
             yield _sse({"type": "done", "verses": [], "themes": [], "session_id": session_id})
         return StreamingResponse(_typed(), media_type="text/event-stream", headers=_SSE_HEADERS)
 
-    # ── SPIRITUAL: RAG retrieval first, then stream ───────────────────────────
+    # ── SPIRITUAL: RAG retrieval first, then async stream ────────────────────
     conversation_context = _session_manager.get_conversation_context(session_id, last_n=3)
     context = retriever.create_context_for_llm(
         body.query,
@@ -167,9 +167,23 @@ async def stream_wisdom(request: Request, body: QueryRequest):
     )
     needs_disclaimer = any(kw in body.query.lower() for kw in MENTAL_HEALTH_KEYWORDS)
 
-    def _spiritual():
+    def _enrich(v):
+        key = f"{v.get('chapter', 0)}_{v.get('verse', 0)}"
+        sk  = sanskrit_index.get(key, {})
+        return {
+            "chapter":         v.get("chapter", 0),
+            "verse":           v.get("verse", 0),
+            "text":            v.get("text", ""),
+            "theme":           v.get("theme", "general"),
+            "verse_id":        v.get("verse_id", ""),
+            "relevance_score": v.get("relevance_score", 0.0),
+            "sanskrit":        sk.get("sanskrit"),
+            "transliteration": sk.get("transliteration"),
+        }
+
+    async def _spiritual():
         full = ""
-        for chunk in llm_handler.stream_response(body.query, context):
+        async for chunk in llm_handler.stream_response_async(body.query, context):
             full += chunk
             yield _sse({"type": "token", "content": chunk})
 
@@ -180,20 +194,6 @@ async def stream_wisdom(request: Request, body: QueryRequest):
         used_verses = context.get("used_verses", [])
         themes      = context.get("query_themes", [])
         _session_manager.add_to_history(session_id, body.query, full, used_verses, themes)
-
-        def _enrich(v):
-            key = f"{v.get('chapter', 0)}_{v.get('verse', 0)}"
-            sk  = sanskrit_index.get(key, {})
-            return {
-                "chapter":         v.get("chapter", 0),
-                "verse":           v.get("verse", 0),
-                "text":            v.get("text", ""),
-                "theme":           v.get("theme", "general"),
-                "verse_id":        v.get("verse_id", ""),
-                "relevance_score": v.get("relevance_score", 0.0),
-                "sanskrit":        sk.get("sanskrit"),
-                "transliteration": sk.get("transliteration"),
-            }
 
         verses_payload = [_enrich(v) for v in used_verses]
         yield _sse({"type": "done", "verses": verses_payload, "themes": themes, "session_id": session_id})
