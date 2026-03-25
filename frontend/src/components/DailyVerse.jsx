@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, Sparkles, Share2 } from 'lucide-react'
 import { getDailyVerse } from '../services/api.js'
 import { shareVerseCard } from '../utils/shareCard.js'
+import ReflectionInput from './ReflectionInput.jsx'
 
 const REFLECTION_PROMPTS = {
   duty:        'How is this teaching calling you to act with integrity today?',
@@ -22,7 +23,7 @@ function formatDate(dateStr) {
   })
 }
 
-export default function DailyVerse({ onQuery }) {
+export default function DailyVerse({ onQuery, onSaveReflection }) {
   const [verse, setVerse]           = useState(null)
   const [loading, setLoading]       = useState(true)
   const [showTranslit, setShowTranslit] = useState(false)
@@ -195,6 +196,22 @@ export default function DailyVerse({ onQuery }) {
                   {reflection}
                 </p>
               </div>
+
+              {/* Reflection input */}
+              {onSaveReflection && (
+                <ReflectionInput
+                  source={{
+                    type:      'daily_verse',
+                    chapter:   verse.chapter,
+                    verse:     verse.verse,
+                    verseText: verse.text,
+                    sanskrit:  verse.sanskrit,
+                    theme:     verse.theme,
+                  }}
+                  prompt={reflection}
+                  onSave={onSaveReflection}
+                />
+              )}
 
               {/* CTA */}
               <button

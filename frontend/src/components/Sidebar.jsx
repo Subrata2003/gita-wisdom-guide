@@ -1,4 +1,4 @@
-import { X, BookOpen, Sparkles, ChevronRight } from 'lucide-react'
+import { X, BookOpen, Sparkles, ChevronRight, PenLine } from 'lucide-react'
 
 const SAMPLE_QUERIES = [
   "I feel lost and don't know my life's purpose",
@@ -28,8 +28,10 @@ export default function Sidebar({
   isOpen,
   onClose,
   onSampleQuery,
+  onOpenJournal,
   apiStatus,
   messageCount,
+  journalCount,
 }) {
   return (
     <>
@@ -84,6 +86,33 @@ export default function Sidebar({
               </div>
             </div>
           )}
+
+          {/* Journal link */}
+          <button
+            onClick={() => { onOpenJournal(); onClose() }}
+            className="w-full flex items-center justify-between p-3 rounded-xl transition-all group"
+            style={{ background: 'rgba(255,215,0,0.05)', border: '1px solid rgba(255,215,0,0.15)' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,215,0,0.35)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,215,0,0.15)'}
+          >
+            <div className="flex items-center gap-2">
+              <PenLine size={14} style={{ color: '#FFD700' }} />
+              <span className="text-[13px] font-semibold" style={{ color: '#FFD700' }}>
+                Reflection Journal
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {journalCount > 0 && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ background: 'rgba(255,215,0,0.15)', color: '#FFD700' }}
+                >
+                  {journalCount}
+                </span>
+              )}
+              <ChevronRight size={13} style={{ color: '#C8A84B' }} />
+            </div>
+          </button>
 
           {/* Explore themes */}
           <div>

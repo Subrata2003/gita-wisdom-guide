@@ -2,13 +2,14 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import VerseCard from './VerseCard.jsx'
 import ThemeBadge from './ThemeBadge.jsx'
+import ReflectionInput from './ReflectionInput.jsx'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function ChatMessage({ message }) {
+export default function ChatMessage({ message, onSaveReflection }) {
   const [versesOpen, setVersesOpen] = useState(false)
   const isUser = message.role === 'user'
 
@@ -98,9 +99,24 @@ export default function ChatMessage({ message }) {
             )}
 
             {!message.streaming && (
-              <p className="text-[10px] text-text-muted mt-3">
-                {formatTime(message.timestamp)}
-              </p>
+              <div className="flex items-center justify-between mt-3 gap-3">
+                <p className="text-[10px] text-text-muted">{formatTime(message.timestamp)}</p>
+                {onSaveReflection && (
+                  <ReflectionInput
+                    source={{
+                      type:      'chat',
+                      query:     message.query,
+                      chapter:   message.verses?.[0]?.chapter,
+                      verse:     message.verses?.[0]?.verse,
+                      verseText: message.verses?.[0]?.text,
+                      sanskrit:  message.verses?.[0]?.sanskrit,
+                      theme:     message.verses?.[0]?.theme,
+                    }}
+                    prompt="What does this teaching stir in you?"
+                    onSave={onSaveReflection}
+                  />
+                )}
+              </div>
             )}
           </div>
         </div>

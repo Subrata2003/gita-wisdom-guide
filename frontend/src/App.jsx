@@ -4,8 +4,10 @@ import Sidebar from './components/Sidebar.jsx'
 import ChatMessage from './components/ChatMessage.jsx'
 import QueryInput from './components/QueryInput.jsx'
 import MandalaBackground from './components/MandalaBackground.jsx'
-import { streamWisdom, getHealth } from './services/api.js'
 import DailyVerse from './components/DailyVerse.jsx'
+import JournalPage from './components/JournalPage.jsx'
+import { streamWisdom, getHealth } from './services/api.js'
+import { useJournal } from './hooks/useJournal.js'
 
 const WELCOME_QUERIES = [
   "I feel lost and don't know my purpose",
@@ -16,7 +18,7 @@ const WELCOME_QUERIES = [
   "I'm afraid of making important decisions",
 ]
 
-function WelcomeScreen({ onQuery }) {
+function WelcomeScreen({ onQuery, onSaveReflection }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
       {/* Hero Om image — screen blend mode removes dark background, gold Om glows through */}
@@ -44,7 +46,7 @@ function WelcomeScreen({ onQuery }) {
       </p>
 
       {/* Daily Verse */}
-      <DailyVerse onQuery={onQuery} />
+      <DailyVerse onQuery={onQuery} onSaveReflection={onSaveReflection} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl w-full">
         {WELCOME_QUERIES.map((q, i) => (
@@ -88,13 +90,19 @@ function TypingIndicator() {
 }
 
 export default function App() {
-  const [messages, setMessages] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [sessionId, setSessionId] = useState(null)
+  const [messages, setMessages]     = useState([])
+  const [isLoading, setIsLoading]   = useState(false)
+  const [sessionId, setSessionId]   = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [apiStatus, setApiStatus] = useState(null)
-  const [error, setError] = useState(null)
+  const [apiStatus, setApiStatus]   = useState(null)
+  const [error, setError]           = useState(null)
+  const [view, setView]             = useState('chat')   // 'chat' | 'journal'
+  const { entries, addEntry, deleteEntry, total: journalCount } = useJournal()
   const bottomRef = useRef(null)
+
+  const handleSaveReflection = useCallback((text, source) => {
+    addEntry(text, source)
+  }, [addEntry])
 
   // Health check on mount
   useEffect(() => {
@@ -194,9 +202,11 @@ export default function App() {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        onSampleQuery={(q) => { setSidebarOpen(false); handleQuery(q) }}
+        onSampleQuery={(q) => { setSidebarOpen(false); setView('chat'); handleQuery(q) }}
+        onOpenJournal={() => setView('journal')}
         apiStatus={apiStatus}
         messageCount={messages.length}
+        journalCount={journalCount}
       />
 
       {/* Main layout — full viewport height */}
@@ -210,13 +220,35 @@ export default function App() {
 
         {/* Scrollable messages area — input is sticky inside this, flows with content */}
         <main className="flex-1 overflow-y-auto flex flex-col">
+
+          {/* Journal view */}
+          {view === 'journal' && (
+            <div className="flex-1">
+              <div className="max-w-2xl mx-auto px-4 pt-4">
+                <button
+                  onClick={() => setView('chat')}
+                  className="text-[12px] text-text-muted hover:text-cream transition-colors mb-2 flex items-center gap-1"
+                >
+                  ← Back to conversation
+                </button>
+              </div>
+              <JournalPage entries={entries} onDelete={deleteEntry} />
+            </div>
+          )}
+
+          {view === 'chat' && (
           <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-6 space-y-5">
             {messages.length === 0 && !isLoading && (
-              <WelcomeScreen onQuery={handleQuery} />
+              <WelcomeScreen onQuery={handleQuery} onSaveReflection={handleSaveReflection} />
             )}
 
             {messages.map((msg, idx) => (
-              <ChatMessage key={idx} message={msg} />
+              <ChatMessage
+                key={idx}
+                message={msg}
+                onSaveReflection={msg.role === 'assistant' && !msg.streaming && !msg.error
+                  ? handleSaveReflection : undefined}
+              />
             ))}
 
             {error && (
@@ -228,16 +260,17 @@ export default function App() {
 
             <div ref={bottomRef} />
           </div>
+          )}
 
-          {/* Input — sticky to the bottom of the scroll container, not viewport-locked */}
-          <div className="sticky bottom-0 bg-midnight border-t border-midnight-300">
+          {/* Input — only shown in chat view, sticky to bottom */}
+          {view === 'chat' && <div className="sticky bottom-0 bg-midnight border-t border-midnight-300">
             <div className="max-w-3xl mx-auto px-4 py-4">
               <QueryInput onSubmit={handleQuery} isLoading={isLoading} />
               <p className="text-center text-[10px] text-text-muted mt-2">
                 Shift+Enter for new line · guidance is spiritual, not medical advice
               </p>
             </div>
-          </div>
+          </div>}
         </main>
       </div>
     </div>
