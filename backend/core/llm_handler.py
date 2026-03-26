@@ -24,6 +24,7 @@ from backend.core.prompts import (
     FACTUAL_SYSTEM,
     MENTAL_HEALTH_KEYWORDS,
     MENTAL_HEALTH_DISCLAIMER,
+    MOOD_TONE_OVERLAYS,
 )
 from backend.core.query_classifier import QueryType
 
@@ -341,6 +342,13 @@ class EnhancedGitaLLMHandler:
         verses_text = context.get("formatted_context", "")
         themes = context.get("query_themes", [])
         conversation_context = context.get("conversation_context", "")
+        mood = context.get("mood", "neutral")
+
+        # Inject mood-specific tone overlay if one is detected
+        mood_overlay = MOOD_TONE_OVERLAYS.get(mood, "")
+        system = SPIRITUAL_GUIDE_SYSTEM
+        if mood_overlay:
+            system = f"{SPIRITUAL_GUIDE_SYSTEM}\n\n{mood_overlay}"
 
         conv_block = ""
         if conversation_context:
@@ -364,7 +372,7 @@ SPIRITUAL THEMES IN THIS QUERY: {themes_str}
 Now speak your guidance. Be specific, warm, and rooted in the verses above.
 Begin directly with acknowledging the seeker — do not start with "I" or "Dear seeker"."""
 
-        return SPIRITUAL_GUIDE_SYSTEM, user_content
+        return system, user_content
 
     # ─── Helpers ──────────────────────────────────────────────────────────────
 

@@ -5,6 +5,16 @@ import ThemeBadge from './ThemeBadge.jsx'
 import ReflectionInput from './ReflectionInput.jsx'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
+const MOOD_CONFIG = {
+  grief:     { emoji: '💙', label: 'Grief',     color: 'rgba(147,197,253,0.7)' },
+  anger:     { emoji: '🔥', label: 'Anger',     color: 'rgba(252,165,165,0.7)' },
+  anxiety:   { emoji: '🌀', label: 'Anxiety',   color: 'rgba(196,181,253,0.7)' },
+  confusion: { emoji: '🔍', label: 'Seeking',   color: 'rgba(253,211,77,0.7)'  },
+  despair:   { emoji: '🌑', label: 'Despair',   color: 'rgba(148,163,184,0.7)' },
+  longing:   { emoji: '🌙', label: 'Longing',   color: 'rgba(221,214,254,0.7)' },
+  curiosity: { emoji: '✨', label: 'Curiosity', color: 'rgba(255,215,0,0.7)'   },
+}
+
 function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
@@ -120,6 +130,22 @@ export default function ChatMessage({ message, onSaveReflection }) {
             )}
           </div>
         </div>
+
+        {/* Mood badge — shown only when a non-neutral mood was detected */}
+        {!message.streaming && message.mood && MOOD_CONFIG[message.mood] && (
+          <div className="flex items-center gap-1.5">
+            <span style={{
+              fontSize: '10px', padding: '2px 9px', borderRadius: '999px',
+              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+              color: MOOD_CONFIG[message.mood].color,
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+            }}>
+              {MOOD_CONFIG[message.mood].emoji} {MOOD_CONFIG[message.mood].label}
+            </span>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>·</span>
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)' }}>tone adapted</span>
+          </div>
+        )}
 
         {/* Theme badges and verse accordion appear only after streaming is done */}
         {message.themes?.length > 0 && !message.streaming && (

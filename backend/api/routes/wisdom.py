@@ -7,6 +7,7 @@ from backend.models.schemas import QueryRequest, WisdomResponse, VerseInfo, Sess
 from backend.core.session_manager import SessionManager
 from backend.core.query_classifier import classify_query, QueryType
 from backend.core.prompts import get_off_topic_response, MENTAL_HEALTH_KEYWORDS, MENTAL_HEALTH_DISCLAIMER
+from backend.core.mood_detector import detect_mood
 
 router = APIRouter()
 
@@ -167,6 +168,10 @@ async def stream_wisdom(request: Request, body: QueryRequest):
     )
     needs_disclaimer = any(kw in body.query.lower() for kw in MENTAL_HEALTH_KEYWORDS)
 
+    # Detect seeker's emotional state — injects tone overlay into system prompt
+    mood, _mood_score = detect_mood(body.query)
+    context["mood"] = mood.value
+
     def _enrich(v):
         key = f"{v.get('chapter', 0)}_{v.get('verse', 0)}"
         sk  = sanskrit_index.get(key, {})
@@ -196,7 +201,7 @@ async def stream_wisdom(request: Request, body: QueryRequest):
         _session_manager.add_to_history(session_id, body.query, full, used_verses, themes)
 
         verses_payload = [_enrich(v) for v in used_verses]
-        yield _sse({"type": "done", "verses": verses_payload, "themes": themes, "session_id": session_id})
+        yield _sse({"type": "done", "verses": verses_payload, "themes": themes, "session_id": session_id, "mood": mood.value})
 
     return StreamingResponse(_spiritual(), media_type="text/event-stream", headers=_SSE_HEADERS)
 

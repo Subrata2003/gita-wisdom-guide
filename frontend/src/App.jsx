@@ -132,6 +132,7 @@ export default function App() {
         streaming: true,
         verses: [],
         themes: [],
+        mood: null,
         timestamp: new Date(),
         error: false,
       }
@@ -163,6 +164,7 @@ export default function App() {
                 streaming: false,
                 verses: event.verses  || [],
                 themes: event.themes  || [],
+                mood:   event.mood    || null,
               }
             }
             return msgs
