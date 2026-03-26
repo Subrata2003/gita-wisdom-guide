@@ -104,6 +104,40 @@ async def search_verses(
     return {"verses": verses, "total": len(verses)}
 
 
+@router.get("/chapter/{chapter_num}/verses")
+async def get_chapter_verses(chapter_num: int, request: Request):
+    """Return all verses for a specific chapter, enriched with Sanskrit."""
+    if chapter_num < 1 or chapter_num > 18:
+        raise HTTPException(status_code=400, detail="Chapter must be between 1 and 18")
+
+    all_verses     = getattr(request.app.state, "all_verses",  [])
+    sanskrit_index = getattr(request.app.state, "sanskrit",    {})
+
+    if not all_verses:
+        raise HTTPException(status_code=503, detail="Verse pool not loaded yet")
+
+    chapter_verses = sorted(
+        [v for v in all_verses if v.get("chapter") == chapter_num],
+        key=lambda v: v.get("verse", 0),
+    )
+
+    result = []
+    for v in chapter_verses:
+        ch, vs = v.get("chapter", 0), v.get("verse", 0)
+        sk = sanskrit_index.get(f"{ch}_{vs}", {})
+        result.append({
+            "chapter":         ch,
+            "verse":           vs,
+            "verse_id":        v.get("verse_id", ""),
+            "text":            v.get("text", ""),
+            "theme":           v.get("theme", "general"),
+            "sanskrit":        sk.get("sanskrit"),
+            "transliteration": sk.get("transliteration"),
+        })
+
+    return {"chapter": chapter_num, "verses": result, "total": len(result)}
+
+
 @router.get("/verse/daily")
 async def get_daily_verse(request: Request):
     """

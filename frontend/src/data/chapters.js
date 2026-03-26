@@ -1,0 +1,145 @@
+/**
+ * Static metadata for all 18 chapters of the Bhagavad Gita.
+ * Verse counts come from the actual processed dataset.
+ */
+
+export const CHAPTERS = [
+  {
+    n: 1,  verses: 35,  theme: 'duty',       emoji: '⚖️',
+    name:    'Arjuna Vishada Yoga',
+    sanskrit:'अर्जुन विषाद योग',
+    title:   'The Yoga of Arjuna\'s Grief',
+    summary: 'Arjuna surveys the battlefield and is overcome with grief at the prospect of fighting his own kinsmen. He lays down his bow, paralysed by sorrow and doubt.',
+  },
+  {
+    n: 2,  verses: 71,  theme: 'knowledge',  emoji: '📚',
+    name:    'Sankhya Yoga',
+    sanskrit:'सांख्य योग',
+    title:   'The Yoga of Knowledge',
+    summary: 'Krishna introduces the immortal nature of the soul and urges Arjuna to rise and fulfil his duty. He lays the philosophical foundation for the entire Gita.',
+  },
+  {
+    n: 3,  verses: 41,  theme: 'action',     emoji: '⚡',
+    name:    'Karma Yoga',
+    sanskrit:'कर्म योग',
+    title:   'The Yoga of Action',
+    summary: 'The yoga of selfless action. Krishna explains why action is necessary and how to perform it without attachment to its fruits — the path of Karma Yoga.',
+  },
+  {
+    n: 4,  verses: 41,  theme: 'knowledge',  emoji: '📚',
+    name:    'Jnana Karma Sanyasa Yoga',
+    sanskrit:'ज्ञान कर्म सन्यास योग',
+    title:   'The Yoga of Wisdom',
+    summary: 'Krishna reveals his divine nature and the cycle of rebirth. He teaches how the fire of wisdom burns all karmic bonds and how true renunciation is internal.',
+  },
+  {
+    n: 5,  verses: 27,  theme: 'detachment', emoji: '🌊',
+    name:    'Karma Vairagya Yoga',
+    sanskrit:'कर्म वैराग्य योग',
+    title:   'The Yoga of Renunciation',
+    summary: 'Krishna reconciles action and renunciation, showing that both lead to liberation when performed with detachment. True sannyasa is the absence of ego, not of work.',
+  },
+  {
+    n: 6,  verses: 44,  theme: 'meditation', emoji: '🧘',
+    name:    'Abhyasa Yoga',
+    sanskrit:'अभ्यास योग',
+    title:   'The Yoga of Meditation',
+    summary: 'Krishna describes the ideal yogi, the practice of meditation, and how to steady the restless mind. He explains what happens to those who fall short of the goal.',
+  },
+  {
+    n: 7,  verses: 30,  theme: 'knowledge',  emoji: '📚',
+    name:    'Paramahamsa Vijnana Yoga',
+    sanskrit:'परमहंस विज्ञान योग',
+    title:   'The Yoga of Realisation',
+    summary: 'Krishna reveals himself as the source of all creation and explains the difference between his lower and higher nature. He describes those who seek him and those who do not.',
+  },
+  {
+    n: 8,  verses: 23,  theme: 'soul',       emoji: '✨',
+    name:    'Aksara Parabrahma Yoga',
+    sanskrit:'अक्षर परब्रह्म योग',
+    title:   'The Yoga of the Imperishable',
+    summary: 'Krishna explains the nature of the imperishable Brahman and the path of liberation at the time of death. He reveals the two cosmic paths — the bright and the dark.',
+  },
+  {
+    n: 9,  verses: 32,  theme: 'devotion',   emoji: '❤️',
+    name:    'Raja Vidya Raja Guhya Yoga',
+    sanskrit:'राज विद्या राज गुह्य योग',
+    title:   'The Yoga of Royal Knowledge',
+    summary: 'Krishna reveals the supreme royal secret — his all-pervading presence. He teaches that sincere devotion, even from the lowest of persons, is the greatest path to him.',
+  },
+  {
+    n: 10, verses: 39,  theme: 'soul',       emoji: '✨',
+    name:    'Vibhuti Vistara Yoga',
+    sanskrit:'विभूति विस्तर योग',
+    title:   'The Yoga of Divine Glories',
+    summary: 'Krishna describes his infinite divine manifestations — he is the beginning, middle and end of all beings, the essence of all that is great, powerful, and glorious.',
+  },
+  {
+    n: 11, verses: 50,  theme: 'devotion',   emoji: '❤️',
+    name:    'Visvarupa Darsana Yoga',
+    sanskrit:'विश्वरूप दर्शन योग',
+    title:   'The Vision of the Cosmic Form',
+    summary: 'Arjuna is granted divine sight to behold Krishna\'s infinite, awe-inspiring universal form — containing all of creation, destruction, and time within itself.',
+  },
+  {
+    n: 12, verses: 16,  theme: 'devotion',   emoji: '❤️',
+    name:    'Bhakti Yoga',
+    sanskrit:'भक्ति योग',
+    title:   'The Yoga of Devotion',
+    summary: 'The shortest chapter, yet perhaps the most beloved. Krishna declares pure devotion as the highest path and tenderly describes the qualities of the devotee most dear to him.',
+  },
+  {
+    n: 13, verses: 31,  theme: 'knowledge',  emoji: '📚',
+    name:    'Ksetra Ksetrajna Vibhaga Yoga',
+    sanskrit:'क्षेत्र क्षेत्रज्ञ विभाग योग',
+    title:   'The Field and the Knower',
+    summary: 'Krishna explains the distinction between the body (the field) and the eternal soul (the knower of the field). He reveals what true knowledge is and what it leads to.',
+  },
+  {
+    n: 14, verses: 21,  theme: 'knowledge',  emoji: '📚',
+    name:    'Gunatraya Vibhaga Yoga',
+    sanskrit:'गुणत्रय विभाग योग',
+    title:   'The Three Qualities of Nature',
+    summary: 'Krishna explains how the three modes — sattva (purity), rajas (passion), and tamas (inertia) — bind the soul and how one transcends them to reach liberation.',
+  },
+  {
+    n: 15, verses: 19,  theme: 'soul',       emoji: '✨',
+    name:    'Purusottama Yoga',
+    sanskrit:'पुरुषोत्तम योग',
+    title:   'The Supreme Person',
+    summary: 'Using the metaphor of an upside-down tree, Krishna describes the illusion of material existence and reveals himself as the Supreme Person beyond both the perishable and the imperishable.',
+  },
+  {
+    n: 16, verses: 19,  theme: 'duty',       emoji: '⚖️',
+    name:    'Daivasura Sampad Vibhaga Yoga',
+    sanskrit:'दैवासुर सम्पद विभाग योग',
+    title:   'The Divine and Demoniac',
+    summary: 'Krishna distinguishes between divine qualities (clarity, compassion, fearlessness) and demoniac qualities (arrogance, greed, cruelty), urging Arjuna to embrace the divine.',
+  },
+  {
+    n: 17, verses: 26,  theme: 'devotion',   emoji: '❤️',
+    name:    'Sraddhatraya Vibhaga Yoga',
+    sanskrit:'श्रद्धात्रय विभाग योग',
+    title:   'The Threefold Faith',
+    summary: 'Krishna explains how faith, food, sacrifice, austerity, and charity each take three forms based on the modes of nature — and how the quality of our faith shapes our reality.',
+  },
+  {
+    n: 18, verses: 75,  theme: 'detachment', emoji: '🌊',
+    name:    'Moksha Sanyasa Yoga',
+    sanskrit:'मोक्ष सन्यास योग',
+    title:   'The Yoga of Liberation',
+    summary: 'The grand conclusion. Krishna summarises the entire Gita, reveals the highest secret of total surrender, and urges Arjuna to act without ego. Arjuna rises and chooses to fight.',
+  },
+]
+
+export const THEME_COLORS = {
+  duty:        { bg: 'rgba(255,140,0,0.12)', border: 'rgba(255,140,0,0.3)', text: '#FF8C00' },
+  knowledge:   { bg: 'rgba(147,197,253,0.10)', border: 'rgba(147,197,253,0.25)', text: '#93C5FD' },
+  action:      { bg: 'rgba(251,191,36,0.10)', border: 'rgba(251,191,36,0.25)', text: '#FBBf24' },
+  detachment:  { bg: 'rgba(129,140,248,0.10)', border: 'rgba(129,140,248,0.25)', text: '#818CF8' },
+  meditation:  { bg: 'rgba(52,211,153,0.10)', border: 'rgba(52,211,153,0.25)', text: '#34D399' },
+  devotion:    { bg: 'rgba(251,113,133,0.10)', border: 'rgba(251,113,133,0.25)', text: '#FB7185' },
+  soul:        { bg: 'rgba(255,215,0,0.10)',   border: 'rgba(255,215,0,0.25)',   text: '#FFD700' },
+  peace:       { bg: 'rgba(125,211,252,0.10)', border: 'rgba(125,211,252,0.25)', text: '#7DD3FC' },
+  general:     { bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.15)', text: '#E2E8F0' },
+}

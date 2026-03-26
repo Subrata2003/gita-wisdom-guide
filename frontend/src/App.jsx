@@ -6,6 +6,8 @@ import QueryInput from './components/QueryInput.jsx'
 import MandalaBackground from './components/MandalaBackground.jsx'
 import DailyVerse from './components/DailyVerse.jsx'
 import JournalPage from './components/JournalPage.jsx'
+import ChapterExplorer from './components/ChapterExplorer.jsx'
+import ChapterDetail from './components/ChapterDetail.jsx'
 import { streamWisdom, getHealth } from './services/api.js'
 import { useJournal } from './hooks/useJournal.js'
 
@@ -96,7 +98,8 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [apiStatus, setApiStatus]   = useState(null)
   const [error, setError]           = useState(null)
-  const [view, setView]             = useState('chat')   // 'chat' | 'journal'
+  const [view, setView]             = useState('chat')   // 'chat' | 'journal' | 'explorer' | 'chapter'
+  const [activeChapter, setActiveChapter] = useState(null)
   const { entries, addEntry, deleteEntry, total: journalCount } = useJournal()
   const bottomRef = useRef(null)
 
@@ -204,6 +207,7 @@ export default function App() {
         onClose={() => setSidebarOpen(false)}
         onSampleQuery={(q) => { setSidebarOpen(false); setView('chat'); handleQuery(q) }}
         onOpenJournal={() => setView('journal')}
+        onOpenExplorer={() => setView('explorer')}
         apiStatus={apiStatus}
         messageCount={messages.length}
         journalCount={journalCount}
@@ -225,14 +229,36 @@ export default function App() {
           {view === 'journal' && (
             <div className="flex-1">
               <div className="max-w-2xl mx-auto px-4 pt-4">
-                <button
-                  onClick={() => setView('chat')}
-                  className="text-[12px] text-text-muted hover:text-cream transition-colors mb-2 flex items-center gap-1"
-                >
+                <button onClick={() => setView('chat')}
+                  className="text-[12px] text-text-muted hover:text-cream transition-colors mb-2 flex items-center gap-1">
                   ← Back to conversation
                 </button>
               </div>
               <JournalPage entries={entries} onDelete={deleteEntry} />
+            </div>
+          )}
+
+          {/* Chapter Explorer */}
+          {view === 'explorer' && (
+            <div className="flex-1">
+              <ChapterExplorer
+                onSelectChapter={(ch) => { setActiveChapter(ch); setView('chapter') }}
+              />
+            </div>
+          )}
+
+          {/* Chapter Detail */}
+          {view === 'chapter' && activeChapter && (
+            <div className="flex-1">
+              <ChapterDetail
+                chapter={activeChapter}
+                onBack={() => setView('explorer')}
+                onAskKrishna={(verse) => {
+                  setView('chat')
+                  handleQuery(`Explain the deep meaning of Chapter ${verse.chapter}, Verse ${verse.verse} and how I can apply it in my life`)
+                }}
+                onSaveReflection={handleSaveReflection}
+              />
             </div>
           )}
 
@@ -262,7 +288,7 @@ export default function App() {
           </div>
           )}
 
-          {/* Input — only shown in chat view, sticky to bottom */}
+          {/* Input — only shown in chat view */}
           {view === 'chat' && <div className="sticky bottom-0 bg-midnight border-t border-midnight-300">
             <div className="max-w-3xl mx-auto px-4 py-4">
               <QueryInput onSubmit={handleQuery} isLoading={isLoading} />

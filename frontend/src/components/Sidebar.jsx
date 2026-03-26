@@ -1,4 +1,4 @@
-import { X, BookOpen, Sparkles, ChevronRight, PenLine } from 'lucide-react'
+import { X, BookOpen, Sparkles, ChevronRight, PenLine, LayoutGrid } from 'lucide-react'
 
 const SAMPLE_QUERIES = [
   "I feel lost and don't know my life's purpose",
@@ -29,6 +29,7 @@ export default function Sidebar({
   onClose,
   onSampleQuery,
   onOpenJournal,
+  onOpenExplorer,
   apiStatus,
   messageCount,
   journalCount,
@@ -86,6 +87,26 @@ export default function Sidebar({
               </div>
             </div>
           )}
+
+          {/* Chapter Explorer link */}
+          <button
+            onClick={() => { onOpenExplorer(); onClose() }}
+            className="w-full flex items-center justify-between p-3 rounded-xl transition-all"
+            style={{ background: 'rgba(147,197,253,0.05)', border: '1px solid rgba(147,197,253,0.15)' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(147,197,253,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(147,197,253,0.15)'}
+          >
+            <div className="flex items-center gap-2">
+              <LayoutGrid size={14} style={{ color: '#93C5FD' }} />
+              <span className="text-[13px] font-semibold" style={{ color: '#93C5FD' }}>
+                Chapter Explorer
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px]" style={{ color: 'rgba(147,197,253,0.5)' }}>18 chapters</span>
+              <ChevronRight size={13} style={{ color: '#7B6FA0' }} />
+            </div>
+          </button>
 
           {/* Journal link */}
           <button
