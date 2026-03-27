@@ -6,7 +6,8 @@
  */
 
 import { useState } from 'react'
-import { BookOpen, Trash2, ChevronDown, ChevronUp, PenLine } from 'lucide-react'
+import { BookOpen, Trash2, ChevronDown, ChevronUp, PenLine, Download } from 'lucide-react'
+import { exportJournalToPDF } from '../utils/exportJournal.js'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-IN', {
@@ -135,7 +136,7 @@ export default function JournalPage({ entries, onDelete }) {
         >
           <BookOpen size={18} style={{ color: '#FFD700' }} />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold" style={{ color: '#FFD700' }}>Reflection Journal</h1>
           <p className="text-[12px] text-text-muted">
             {entries.length === 0
@@ -143,6 +144,24 @@ export default function JournalPage({ entries, onDelete }) {
               : `${entries.length} reflection${entries.length !== 1 ? 's' : ''} saved`}
           </p>
         </div>
+
+        {/* Export PDF button — only shown when there are entries */}
+        {entries.length > 0 && (
+          <button
+            onClick={() => exportJournalToPDF(entries)}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium
+                       transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: 'rgba(255,215,0,0.08)',
+              border: '1px solid rgba(255,215,0,0.25)',
+              color: '#FFD700',
+            }}
+            title="Export journal as PDF"
+          >
+            <Download size={13} />
+            Export PDF
+          </button>
+        )}
       </div>
 
       {/* Empty state */}
