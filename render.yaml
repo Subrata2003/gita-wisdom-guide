@@ -9,6 +9,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.0"
+      - key: PIP_NO_BUILD_ISOLATION
+        value: "false"
       - key: GOOGLE_API_KEY
         sync: false        # set manually in Render dashboard
       - key: GROQ_API_KEY
