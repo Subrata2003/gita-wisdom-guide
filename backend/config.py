@@ -20,6 +20,9 @@ class Settings:
     GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
+    # ── Embeddings ────────────────────────────────────────────────────────────
+    VOYAGE_API_KEY: str = os.getenv("VOYAGE_API_KEY", "")
+
     # Primary Gemini model — gemini-3.1-flash-lite-preview = 500 RPD / 15 RPM (free tier)
     DEFAULT_LLM: str = os.getenv("DEFAULT_LLM", "gemini-3.1-flash-lite-preview")
     # Groq fallback model — used automatically when Gemini hits rate limits

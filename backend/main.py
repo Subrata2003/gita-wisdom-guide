@@ -109,6 +109,9 @@ app = FastAPI(
 )
 
 # ── CORS ──────────────────────────────────────────────────────
+# ALLOWED_ORIGINS env var accepts comma-separated extra origins (e.g. Vercel URL)
+import os as _os
+_extra = [o.strip() for o in _os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -116,7 +119,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
-    ],
+    ] + _extra,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

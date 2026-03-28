@@ -1,157 +1,142 @@
-import chromadb
-from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
+"""
+Gita Wisdom Guide — Vector Store
+
+Embedding provider: fastembed  BAAI/bge-small-en-v1.5  (384-dim, ONNX)
+Vector DB: ChromaDB (local persistent)
+
+Why fastembed:
+  - Uses ONNX Runtime, NOT PyTorch  →  ~150 MB RAM vs ~500 MB for sentence-transformers
+  - Fully local, zero API calls, zero rate limits, zero credit card needed
+  - Fits comfortably in Render free tier (512 MB)
+  - ~24 MB model downloaded once on first use, then cached
+"""
+
 import json
-from typing import List, Dict, Optional
 import uuid
+from pathlib import Path
+from typing import List, Dict, Optional
+
+import chromadb
+
+_EMBED_MODEL = "BAAI/bge-small-en-v1.5"
+_BATCH_SIZE  = 128
+
 
 class GitaVectorStore:
-    def __init__(self, collection_name: str = "gita_wisdom", persist_directory: str = "./vector_db"):
-        """Initialize the vector store"""
-        self.collection_name = collection_name
+    def __init__(
+        self,
+        collection_name: str = "gita_wisdom",
+        persist_directory: str = "./vector_db",
+    ):
+        self.collection_name   = collection_name
         self.persist_directory = persist_directory
-        
-        # Initialize ChromaDB client
-        self.client = chromadb.PersistentClient(path=persist_directory)
-        
-        # Initialize embedding model
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-        
-        # Get or create collection
-        self.collection = self.client.get_or_create_collection(
+
+        self.client        = chromadb.PersistentClient(path=persist_directory)
+        self._embed_model  = None   # lazy-loaded on first embed call
+        self.collection    = self.client.get_or_create_collection(
             name=collection_name,
-            metadata={"description": "Bhagavad Gita verses and wisdom"}
+            metadata={"description": "Bhagavad Gita verses and wisdom"},
         )
-    
+
+    # ── Embedding helpers ─────────────────────────────────────────────────────
+
+    def _get_model(self):
+        if self._embed_model is None:
+            from fastembed import TextEmbedding
+            self._embed_model = TextEmbedding(model_name=_EMBED_MODEL)
+        return self._embed_model
+
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
-        """Create embeddings for given texts"""
-        return self.embedding_model.encode(texts).tolist()
+        """Embed a list of texts; returns list of float vectors."""
+        model = self._get_model()
+        return [emb.tolist() for emb in model.embed(texts)]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Embed texts for indexing (alias for embed_texts)."""
+        """Alias used by the indexing pipeline."""
         return self.embed_texts(texts)
 
     def embed_query(self, text: str) -> List[float]:
         """Embed a single search query."""
-        return self.embed_texts([text])[0]
-    
+        model = self._get_model()
+        return next(model.embed([text])).tolist()
+
+    # ── Indexing ──────────────────────────────────────────────────────────────
+
     def add_documents(self, documents: List[Dict]) -> None:
-        """Add documents to the vector store"""
-        texts = []
+        texts     = [doc["text"] for doc in documents]
+        ids       = [str(uuid.uuid4()) for _ in documents]
         metadatas = []
-        ids = []
-        
+
         for doc in documents:
-            # Create unique ID
-            doc_id = str(uuid.uuid4())
-            ids.append(doc_id)
-            
-            # Extract text
-            texts.append(doc['text'])
-            
-            # Prepare metadata (ChromaDB requires string values)
-            metadata = {
-                'chapter': str(doc.get('chapter', '')),
-                'verse': str(doc.get('verse', '')),
-                'verse_id': doc.get('verse_id', ''),
-                'content_type': doc.get('content_type', 'verse'),
-                'theme': doc.get('theme', 'general')
+            meta = {
+                "chapter":      str(doc.get("chapter", "")),
+                "verse":        str(doc.get("verse", "")),
+                "verse_id":     doc.get("verse_id", ""),
+                "content_type": doc.get("content_type", "verse"),
+                "theme":        doc.get("theme", "general"),
             }
-            
-            # Add chunk-specific metadata if available
-            if 'chunk_id' in doc:
-                metadata['chunk_id'] = doc['chunk_id']
-                metadata['chapter_range'] = doc.get('chapter_range', '')
-                metadata['verse_range'] = doc.get('verse_range', '')
-            
-            metadatas.append(metadata)
-        
-        # Create embeddings
+            if "chunk_id" in doc:
+                meta["chunk_id"]      = doc["chunk_id"]
+                meta["chapter_range"] = doc.get("chapter_range", "")
+                meta["verse_range"]   = doc.get("verse_range", "")
+            metadatas.append(meta)
+
         embeddings = self.embed_texts(texts)
-        
-        # Add to collection
+
         self.collection.add(
             documents=texts,
             metadatas=metadatas,
             embeddings=embeddings,
-            ids=ids
+            ids=ids,
         )
-        
-        print(f"Added {len(documents)} documents to vector store")
-    
-    def search_similar(self, query: str, n_results: int = 5, 
-                      filter_metadata: Optional[Dict] = None) -> Dict:
-        """Search for similar documents"""
-        # Create query embedding
-        query_embedding = self.embed_texts([query])[0]
-        
-        # Search in collection
-        results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=n_results,
-            where=filter_metadata,
-            include=['documents', 'metadatas', 'distances']
-        )
-        
-        return results
-    
-    def search_by_theme(self, query: str, theme: str, n_results: int = 3) -> Dict:
-        """Search documents filtered by theme"""
-        filter_metadata = {"theme": theme}
-        return self.search_similar(query, n_results, filter_metadata)
-    
-    def search_by_chapter(self, query: str, chapter: int, n_results: int = 3) -> Dict:
-        """Search documents filtered by chapter"""
-        filter_metadata = {"chapter": str(chapter)}
-        return self.search_similar(query, n_results, filter_metadata)
-    
-    def get_collection_info(self) -> Dict:
-        """Get information about the collection"""
-        count = self.collection.count()
-        return {
-            "collection_name": self.collection_name,
-            "document_count": count,
-            "embedding_model": "all-MiniLM-L6-v2"
-        }
-    
+        print(f"  Added {len(documents)} documents")
+
     def load_and_index_data(self, data_path: str) -> None:
-        """Load processed data and create vector index"""
-        with open(data_path, 'r', encoding='utf-8') as f:
+        """Load processed data JSON and rebuild the entire vector index."""
+        with open(data_path, "r", encoding="utf-8") as f:
             documents = json.load(f)
-        
-        # Clear existing collection
+
+        # Drop and recreate to avoid dimension-mismatch on model switch
         self.client.delete_collection(self.collection_name)
         self.collection = self.client.get_or_create_collection(
             name=self.collection_name,
-            metadata={"description": "Bhagavad Gita verses and wisdom"}
+            metadata={"description": "Bhagavad Gita verses and wisdom"},
         )
-        
-        # Add documents in batches
-        batch_size = 100
-        for i in range(0, len(documents), batch_size):
-            batch = documents[i:i + batch_size]
+
+        for i in range(0, len(documents), _BATCH_SIZE):
+            batch = documents[i : i + _BATCH_SIZE]
             self.add_documents(batch)
-        
+            print(f"  Progress: {min(i + _BATCH_SIZE, len(documents))}/{len(documents)}")
+
         print(f"Successfully indexed {len(documents)} documents")
 
-# Usage example
-if __name__ == "__main__":
-    # Initialize vector store
-    vector_store = GitaVectorStore()
-    
-    # Load and index the processed data
-    vector_store.load_and_index_data('data/processed_gita_data.json')
-    
-    # Test search
-    results = vector_store.search_similar("How to deal with depression and sadness?", n_results=3)
-    
-    print("Search Results:")
-    for i, (doc, metadata, distance) in enumerate(zip(
-        results['documents'][0], 
-        results['metadatas'][0], 
-        results['distances'][0]
-    )):
-        print(f"\nResult {i+1} (Distance: {distance:.3f}):")
-        print(f"Chapter {metadata['chapter']}, Verse {metadata['verse']}")
-        print(f"Theme: {metadata['theme']}")
-        print(f"Text: {doc[:200]}...")
+    # ── Search ────────────────────────────────────────────────────────────────
+
+    def search_similar(
+        self,
+        query: str,
+        n_results: int = 5,
+        filter_metadata: Optional[Dict] = None,
+    ) -> Dict:
+        query_embedding = self.embed_query(query)
+        return self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=n_results,
+            where=filter_metadata,
+            include=["documents", "metadatas", "distances"],
+        )
+
+    def search_by_theme(self, query: str, theme: str, n_results: int = 3) -> Dict:
+        return self.search_similar(query, n_results, {"theme": theme})
+
+    def search_by_chapter(self, query: str, chapter: int, n_results: int = 3) -> Dict:
+        return self.search_similar(query, n_results, {"chapter": str(chapter)})
+
+    # ── Info ──────────────────────────────────────────────────────────────────
+
+    def get_collection_info(self) -> Dict:
+        return {
+            "collection_name": self.collection_name,
+            "document_count":  self.collection.count(),
+            "embedding_model": _EMBED_MODEL,
+        }

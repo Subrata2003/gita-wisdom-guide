@@ -1,7 +1,11 @@
 import axios from 'axios'
 
+// In production (Vercel), VITE_API_URL points to the Render backend.
+// In development, empty string keeps the Vite proxy working.
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_BASE}/api`,
   headers: { 'Content-Type': 'application/json' },
   timeout: 60000, // 60s — LLM can be slow
 })
@@ -71,12 +75,12 @@ export const clearSession = async (sessionId) => {
  *
  * Returns { abort } — call abort() to cancel mid-stream.
  */
-// In development, Vite's proxy buffers SSE responses (waits for stream to close
-// before forwarding anything). We bypass it by calling the backend directly.
-// CORS on the backend already allows http://localhost:5173.
+// SSE stream URL:
+// - Dev: bypass Vite proxy (it buffers SSE) and call backend directly
+// - Prod: use VITE_API_URL (Render backend) directly — same domain issue doesn't apply
 const STREAM_URL = import.meta.env.DEV
   ? 'http://127.0.0.1:8000/api/query/stream'
-  : '/api/query/stream'
+  : `${API_BASE}/api/query/stream`
 
 export function streamWisdom(query, sessionId, { onToken, onDone, onError }) {
   const controller = new AbortController()

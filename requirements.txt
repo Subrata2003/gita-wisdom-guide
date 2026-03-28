@@ -1,21 +1,19 @@
-# Core dependencies
-pandas
-numpy
-scikit-learn
+# ── Embeddings (fastembed — ONNX, no PyTorch, ~150 MB RAM) ───────────────────
+fastembed
 
-# Vector database and embeddings
+# ── Vector database ───────────────────────────────────────────────────────────
 chromadb==1.0.20
-sentence-transformers
 
-# LLM and API
+# ── LLM providers ─────────────────────────────────────────────────────────────
 google-generativeai
 groq
 
-# Web frameworks
+# ── Web framework ─────────────────────────────────────────────────────────────
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 python-multipart>=0.0.6
 
-# Utilities
+# ── Utilities ─────────────────────────────────────────────────────────────────
 python-dotenv
 pydantic>=2.0.0
+numpy

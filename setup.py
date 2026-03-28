@@ -27,13 +27,15 @@ def check_env():
     from dotenv import load_dotenv
     load_dotenv(ROOT / ".env")
 
-    api_key = os.getenv("GOOGLE_API_KEY", "")
-    if not api_key or api_key == "your_google_api_key_here":
-        print("  WARNING: GOOGLE_API_KEY is not set in .env")
-        print("  Get a free key at https://aistudio.google.com/")
-        print("  The vector store will still be built; only LLM responses will fail.")
-    else:
-        print(f"  GOOGLE_API_KEY: set ({api_key[:8]}...)")
+    for key, url in [
+        ("GOOGLE_API_KEY",  "https://aistudio.google.com/"),
+        ("VOYAGE_API_KEY",  "https://www.voyageai.com"),
+    ]:
+        val = os.getenv(key, "")
+        if not val or val.startswith("your_"):
+            print(f"  WARNING: {key} is not set in .env  ({url})")
+        else:
+            print(f"  {key}: set ({val[:10]}...)")
 
 
 def process_data():
@@ -81,7 +83,7 @@ def build_vector_store():
         print("  (To force rebuild: delete the vector_db/ folder and re-run setup.py)")
         return
 
-    print(f"  Indexing {processed_path} into ChromaDB...")
+    print(f"  Indexing {processed_path} into ChromaDB (Google text-embedding-004)...")
     vs.load_and_index_data(str(processed_path))
     final_count = vs.get_collection_info().get("document_count", 0)
     print(f"  Indexed {final_count} documents into {settings.VECTOR_DB_PATH}")
