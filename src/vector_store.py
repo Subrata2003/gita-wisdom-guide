@@ -6,14 +6,13 @@ Vector DB: ChromaDB (local persistent)
 
 Why fastembed:
   - Uses ONNX Runtime, NOT PyTorch  →  ~150 MB RAM vs ~500 MB for sentence-transformers
-  - Fully local, zero API calls, zero rate limits, zero credit card needed
+  - Fully local, zero API calls, zero rate limits
   - Fits comfortably in Render free tier (512 MB)
-  - ~24 MB model downloaded once on first use, then cached
+  - ~24 MB model downloaded once on first startup, then cached
 """
 
 import json
 import uuid
-from pathlib import Path
 from typing import List, Dict, Optional
 
 import chromadb
@@ -31,9 +30,9 @@ class GitaVectorStore:
         self.collection_name   = collection_name
         self.persist_directory = persist_directory
 
-        self.client        = chromadb.PersistentClient(path=persist_directory)
-        self._embed_model  = None   # lazy-loaded on first embed call
-        self.collection    = self.client.get_or_create_collection(
+        self.client       = chromadb.PersistentClient(path=persist_directory)
+        self._embed_model = None   # lazy-loaded on first embed call
+        self.collection   = self.client.get_or_create_collection(
             name=collection_name,
             metadata={"description": "Bhagavad Gita verses and wisdom"},
         )
@@ -47,16 +46,13 @@ class GitaVectorStore:
         return self._embed_model
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
-        """Embed a list of texts; returns list of float vectors."""
         model = self._get_model()
         return [emb.tolist() for emb in model.embed(texts)]
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Alias used by the indexing pipeline."""
         return self.embed_texts(texts)
 
     def embed_query(self, text: str) -> List[float]:
-        """Embed a single search query."""
         model = self._get_model()
         return next(model.embed([text])).tolist()
 
@@ -82,7 +78,6 @@ class GitaVectorStore:
             metadatas.append(meta)
 
         embeddings = self.embed_texts(texts)
-
         self.collection.add(
             documents=texts,
             metadatas=metadatas,
@@ -96,7 +91,6 @@ class GitaVectorStore:
         with open(data_path, "r", encoding="utf-8") as f:
             documents = json.load(f)
 
-        # Drop and recreate to avoid dimension-mismatch on model switch
         self.client.delete_collection(self.collection_name)
         self.collection = self.client.get_or_create_collection(
             name=self.collection_name,
@@ -118,9 +112,8 @@ class GitaVectorStore:
         n_results: int = 5,
         filter_metadata: Optional[Dict] = None,
     ) -> Dict:
-        query_embedding = self.embed_query(query)
         return self.collection.query(
-            query_embeddings=[query_embedding],
+            query_embeddings=[self.embed_query(query)],
             n_results=n_results,
             where=filter_metadata,
             include=["documents", "metadatas", "distances"],
