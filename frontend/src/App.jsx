@@ -8,6 +8,7 @@ import DailyVerse from './components/DailyVerse.jsx'
 import JournalPage from './components/JournalPage.jsx'
 import ChapterExplorer from './components/ChapterExplorer.jsx'
 import ChapterDetail from './components/ChapterDetail.jsx'
+import WakeUpScreen from './components/WakeUpScreen.jsx'
 import { streamWisdom, getHealth } from './services/api.js'
 import { useJournal } from './hooks/useJournal.js'
 
@@ -92,6 +93,7 @@ function TypingIndicator() {
 }
 
 export default function App() {
+  const [backendReady, setBackendReady] = useState(false)
   const [messages, setMessages]     = useState([])
   const [isLoading, setIsLoading]   = useState(false)
   const [sessionId, setSessionId]   = useState(null)
@@ -187,6 +189,10 @@ export default function App() {
     setSessionId(null)
     setError(null)
   }, [])
+
+  if (!backendReady) {
+    return <WakeUpScreen onReady={() => setBackendReady(true)} />
+  }
 
   return (
     <div className="min-h-screen bg-midnight flex flex-col relative overflow-hidden">
