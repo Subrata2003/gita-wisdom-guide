@@ -5,7 +5,7 @@
  * Once the backend responds, calls onReady() to fade into the main app.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getHealth } from '../services/api.js'
 
 const MESSAGES = [
@@ -20,6 +20,8 @@ export default function WakeUpScreen({ onReady }) {
   const [seconds,  setSeconds]  = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
   const [fading,   setFading]   = useState(false)
+  const onReadyRef = useRef(onReady)
+  useEffect(() => { onReadyRef.current = onReady }, [onReady])
 
   // Rotate messages every 4 seconds
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function WakeUpScreen({ onReady }) {
           await getHealth()
           if (!stopped) {
             setFading(true)
-            setTimeout(onReady, 700)   // wait for fade-out animation
+            setTimeout(() => onReadyRef.current(), 700)   // wait for fade-out animation
           }
           return
         } catch {
@@ -55,7 +57,7 @@ export default function WakeUpScreen({ onReady }) {
 
     poll()
     return () => { stopped = true }
-  }, [onReady])
+  }, [])  // intentionally empty — onReady is accessed via ref to avoid restart loop
 
   return (
     <div
