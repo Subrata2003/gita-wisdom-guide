@@ -3,7 +3,8 @@ import ReactMarkdown from 'react-markdown'
 import VerseCard from './VerseCard.jsx'
 import ThemeBadge from './ThemeBadge.jsx'
 import ReflectionInput from './ReflectionInput.jsx'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import ShareModal from './ShareModal.jsx'
+import { ChevronDown, ChevronUp, Share2 } from 'lucide-react'
 
 const MOOD_CONFIG = {
   grief:     { emoji: '💙', label: 'Grief',     color: 'rgba(147,197,253,0.7)' },
@@ -20,7 +21,8 @@ function formatTime(date) {
 }
 
 export default function ChatMessage({ message, onSaveReflection }) {
-  const [versesOpen, setVersesOpen] = useState(false)
+  const [versesOpen,   setVersesOpen]   = useState(false)
+  const [shareOpen,    setShareOpen]    = useState(false)
   const isUser = message.role === 'user'
 
   if (isUser) {
@@ -43,6 +45,7 @@ export default function ChatMessage({ message, onSaveReflection }) {
 
   // Assistant message
   return (
+    <>
     <div className="flex items-start gap-3 msg-enter">
       {/* Avatar — transparent PNG, no background needed */}
       <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
@@ -110,7 +113,23 @@ export default function ChatMessage({ message, onSaveReflection }) {
 
             {!message.streaming && (
               <div className="flex items-center justify-between mt-3 gap-3">
-                <p className="text-[10px] text-text-muted">{formatTime(message.timestamp)}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-[10px] text-text-muted">{formatTime(message.timestamp)}</p>
+                  {/* Share button */}
+                  <button
+                    onClick={() => setShareOpen(true)}
+                    title="Share as quote card"
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                      color: 'rgba(255,215,0,0.45)', lineHeight: 0,
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,215,0,0.85)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,215,0,0.45)')}
+                  >
+                    <Share2 size={13} />
+                  </button>
+                </div>
                 {onSaveReflection && (
                   <ReflectionInput
                     source={{
@@ -180,5 +199,11 @@ export default function ChatMessage({ message, onSaveReflection }) {
         )}
       </div>
     </div>
+
+    {/* Share modal — rendered outside the bubble to avoid clipping */}
+    {shareOpen && (
+      <ShareModal message={message} onClose={() => setShareOpen(false)} />
+    )}
+    </>
   )
 }
