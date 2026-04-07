@@ -4,6 +4,7 @@ import VerseCard from './VerseCard.jsx'
 import ThemeBadge from './ThemeBadge.jsx'
 import ReflectionInput from './ReflectionInput.jsx'
 import ShareModal from './ShareModal.jsx'
+import { generateFollowUps } from '../utils/generateFollowUps.js'
 import { ChevronDown, ChevronUp, Share2 } from 'lucide-react'
 
 const MOOD_CONFIG = {
@@ -20,7 +21,7 @@ function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function ChatMessage({ message, onSaveReflection }) {
+export default function ChatMessage({ message, onSaveReflection, onQuery }) {
   const [versesOpen,   setVersesOpen]   = useState(false)
   const [shareOpen,    setShareOpen]    = useState(false)
   const isUser = message.role === 'user'
@@ -172,6 +173,47 @@ export default function ChatMessage({ message, onSaveReflection }) {
             {message.themes.map((t) => (
               <ThemeBadge key={t} theme={t} />
             ))}
+          </div>
+        )}
+
+        {/* Follow-up question chips */}
+        {!message.streaming && !message.error && onQuery && message.content && (
+          <div style={{ marginTop: 4 }}>
+            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginBottom: 8, letterSpacing: '0.06em' }}>
+              CONTINUE EXPLORING
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {generateFollowUps(message).map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => onQuery(q)}
+                  style={{
+                    textAlign: 'left',
+                    background: 'rgba(255,140,0,0.05)',
+                    border: '1px solid rgba(255,140,0,0.18)',
+                    borderRadius: 8,
+                    padding: '7px 12px',
+                    cursor: 'pointer',
+                    color: 'rgba(255,220,150,0.75)',
+                    fontSize: 12,
+                    lineHeight: 1.4,
+                    transition: 'background 0.2s, border-color 0.2s, color 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'rgba(255,140,0,0.12)'
+                    e.currentTarget.style.borderColor = 'rgba(255,140,0,0.4)'
+                    e.currentTarget.style.color = 'rgba(255,220,150,1)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'rgba(255,140,0,0.05)'
+                    e.currentTarget.style.borderColor = 'rgba(255,140,0,0.18)'
+                    e.currentTarget.style.color = 'rgba(255,220,150,0.75)'
+                  }}
+                >
+                  ✦ {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

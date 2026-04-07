@@ -282,6 +282,8 @@ export default function App() {
                 message={msg}
                 onSaveReflection={msg.role === 'assistant' && !msg.streaming && !msg.error
                   ? handleSaveReflection : undefined}
+                onQuery={msg.role === 'assistant' && !msg.streaming && !msg.error
+                  ? handleQuery : undefined}
               />
             ))}
 
