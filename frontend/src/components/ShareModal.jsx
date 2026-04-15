@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { X, Download, Copy, Check } from 'lucide-react'
 import { generateQuoteCard } from '../utils/generateQuoteCard.js'
+import { toast } from '../utils/toast.js'
 
 export default function ShareModal({ message, onClose }) {
   const [imgUrl,  setImgUrl]  = useState(null)
@@ -23,6 +24,7 @@ export default function ShareModal({ message, onClose }) {
     a.href     = imgUrl
     a.download = 'gita-wisdom.png'
     a.click()
+    toast('Quote card downloaded')
   }
 
   const handleCopy = async () => {
@@ -31,6 +33,7 @@ export default function ShareModal({ message, onClose }) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
       setCopied(true)
       setTimeout(() => setCopied(false), 2200)
+      toast('Image copied to clipboard')
     } catch {
       // Clipboard API not supported — fall back to download
       handleDownload()

@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { BookOpen, Trash2, ChevronDown, ChevronUp, PenLine, Download } from 'lucide-react'
 import { exportJournalToPDF } from '../utils/exportJournal.js'
+import { toast } from '../utils/toast.js'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-IN', {
@@ -148,7 +149,7 @@ export default function JournalPage({ entries, onDelete }) {
         {/* Export PDF button — only shown when there are entries */}
         {entries.length > 0 && (
           <button
-            onClick={() => exportJournalToPDF(entries)}
+            onClick={() => { exportJournalToPDF(entries); toast('Journal downloaded as PDF') }}
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium
                        transition-all hover:scale-105 active:scale-95"
             style={{

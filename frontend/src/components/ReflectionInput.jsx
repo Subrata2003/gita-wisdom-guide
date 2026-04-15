@@ -12,6 +12,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { PenLine, Check, X } from 'lucide-react'
+import { toast } from '../utils/toast.js'
 
 export default function ReflectionInput({ source, prompt, onSave }) {
   const [open, setOpen]       = useState(false)
@@ -31,6 +32,7 @@ export default function ReflectionInput({ source, prompt, onSave }) {
     setSaved(true)
     setOpen(false)
     setText('')
+    toast('Reflection saved to your journal')
   }
 
   function handleKeyDown(e) {
