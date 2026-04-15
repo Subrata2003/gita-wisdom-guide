@@ -5,7 +5,8 @@ import ThemeBadge from './ThemeBadge.jsx'
 import ReflectionInput from './ReflectionInput.jsx'
 import ShareModal from './ShareModal.jsx'
 import { generateFollowUps } from '../utils/generateFollowUps.js'
-import { ChevronDown, ChevronUp, Share2 } from 'lucide-react'
+import { toast } from '../utils/toast.js'
+import { ChevronDown, ChevronUp, Share2, Clipboard } from 'lucide-react'
 
 const MOOD_CONFIG = {
   grief:     { emoji: '💙', label: 'Grief',     color: 'rgba(147,197,253,0.7)' },
@@ -116,6 +117,26 @@ export default function ChatMessage({ message, onSaveReflection, onQuery }) {
               <div className="flex items-center justify-between mt-3 gap-3">
                 <div className="flex items-center gap-3">
                   <p className="text-[10px] text-text-muted">{formatTime(message.timestamp)}</p>
+                  {/* Copy response button */}
+                  <button
+                    onClick={() => {
+                      const plain = message.content.replace(/[#*`]/g, '').trim()
+                      navigator.clipboard.writeText(plain).then(() => {
+                        toast('Response copied to clipboard')
+                      }).catch(() => toast('Could not copy', 'error'))
+                    }}
+                    title="Copy response"
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                      color: 'rgba(255,215,0,0.45)', lineHeight: 0,
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,215,0,0.85)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,215,0,0.45)')}
+                  >
+                    <Clipboard size={13} />
+                  </button>
+
                   {/* Share button */}
                   <button
                     onClick={() => setShareOpen(true)}

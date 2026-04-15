@@ -9,6 +9,7 @@ import JournalPage from './components/JournalPage.jsx'
 import ChapterExplorer from './components/ChapterExplorer.jsx'
 import ChapterDetail from './components/ChapterDetail.jsx'
 import WakeUpScreen from './components/WakeUpScreen.jsx'
+import ToastContainer from './components/ToastContainer.jsx'
 import { streamWisdom, getHealth } from './services/api.js'
 import { useJournal } from './hooks/useJournal.js'
 
@@ -209,6 +210,7 @@ export default function App() {
         <div className="absolute inset-0" style={{ background: 'rgba(10, 13, 46, 0.72)' }} />
       </div>
       <MandalaBackground />
+      <ToastContainer />
 
       <Sidebar
         isOpen={sidebarOpen}
